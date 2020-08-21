@@ -1,0 +1,15 @@
+<html>
+<head>
+<title> Address map for {{ device.name }}</title>
+</head>
+<body>
+<h1> Address map for {{ device.name }}</h1>
+<table border=1>
+{%- for p in device.peripherals %}
+<tr>
+<td>{{p.name}}</td><td>{{"0x%08x"|format(p.base_address)}}</td><td> {{ p.description }}</td></tr>
+</tr>
+{%- endfor %}
+</table>
+</body>
+</html>

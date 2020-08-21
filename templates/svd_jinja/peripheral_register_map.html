@@ -1,0 +1,15 @@
+<html>
+<head>
+<title> Register map for {{ peripheral.name }}</title>
+</head>
+<body>
+<h1> Register map for {{ peripheral.name }}</h1>
+<table border=1>
+{%- for r in peripheral.registers %}
+<tr>
+<td>{{r.name}}</td><td>{{"0x%08x"|format(r.address_offset)}}</td><td> {{ r.description }}</td></tr>
+</tr>
+{%- endfor %}
+</table>
+</body>
+</html>
