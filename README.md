@@ -1,2 +1,4 @@
-# development-scripts
-Misc scripts for assisting development
+# development-utils
+
+Misc scripts, templates, common classes etc for assisting development.
+

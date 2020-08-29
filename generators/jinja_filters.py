@@ -10,13 +10,13 @@ def to_c_type(bit_width):
     """ Convert a bitwidth to the nearest <stdint.h> type that can hold it.
     """
     if bit_width > 32:
-        return "uint64_t"
+        return "std::uint64_t"
     if bit_width > 16:
-        return "uint32_t"
+        return "std::uint32_t"
     if bit_width > 8:
-        return "uint16_t"
+        return "std::uint16_t"
     if bit_width > 1:
-        return "uint8_t"
+        return "std::uint8_t"
     return "bool"
 
 def to_name(desc):
