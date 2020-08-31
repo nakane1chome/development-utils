@@ -8,7 +8,7 @@ CPPFLAGS=-I../../cxx_mmio_interface/include/
 CXXFLAGS=-mcpu=cortex-m3 -g -O2 -std=c++17
 LDFLAGS=-nostartfiles
 
-all : test_CMSDK_CM3 test_CMSDK_CM3.disasm 
+all : test_CMSDK_CM3 test_CMSDK_CM3.disasm  test_single_write test_single_write.disasm 
 
 %.disasm : %
 	${CROSS_COMPILE}objdump -S $<  > $@

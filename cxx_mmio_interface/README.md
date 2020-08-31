@@ -11,7 +11,7 @@ There are two parts.
 The generators assume an CMSIS-SVD definition of the registers.
 
 As the bulk of the class library is generated, the client code
-does not need alot of boilerplate. Access is as simple as the
+does not need a lot of boilerplate. Access is as simple as the
 structure method used by CMSIS device definitions. However, the base
 address is a template parameter. This has advantages and
 disadvantages.
@@ -39,5 +39,4 @@ TODO:
  - Add some read/write protection.
  - Make use of ARM Cortex-M bit banding region.
  - Make better use of operators.
-
 

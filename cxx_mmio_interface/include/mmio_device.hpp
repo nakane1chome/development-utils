@@ -88,8 +88,10 @@ template<uintptr_t BASE_ADDR, class R, class F> class reg_field {
      */
     void write(f_datatype_t value) {
         if constexpr ((R::bit_width == F::bit_width) && (F::bit_offset == 0)) {
+           // Write to single bit.
            *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = (r_datatype_t) value ;
         } else if constexpr (R::field_count == 1) {
+           // Write to single field.
            *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = 
                ((r_datatype_t)value << F::bit_offset) & F::bit_mask;
         } else {
