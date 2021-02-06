@@ -9,6 +9,39 @@
 
 namespace mmio_device {
 
+    /** Generic definintion of a 32 bit register mapped to 32 bit address space.
+    */
+    struct generic_32bit_register_spec {
+        struct reg {
+            using datatype = std::uint32_t;
+            static constexpr unsigned int offset = 0x0;
+            static constexpr unsigned int bit_width = 32;
+            static constexpr unsigned int field_count = 0;
+        };
+    };
+    /** Generic definintion of a 64 bit register mapped to 32 bit address space.
+    */
+    struct generic_64bit_register_spec {
+        struct reg {
+            using datatype = std::uint64_t;
+            static constexpr unsigned int offset = 0x0;
+            static constexpr unsigned int bit_width = 64;
+            static constexpr unsigned int field_count = 0;
+        }; 
+        struct high_reg {
+            using datatype = std::uint32_t;
+            static constexpr unsigned int offset = __ORDER_LITTLE_ENDIAN__ ? 0x4 : 0x0;
+            static constexpr unsigned int bit_width = 32;
+            static constexpr unsigned int field_count = 0;
+        }; 
+        struct low_reg {
+            using datatype = std::uint32_t;
+            static constexpr unsigned int offset = __ORDER_LITTLE_ENDIAN__ ? 0x0 : 0x4;
+            static constexpr unsigned int bit_width = 32;
+            static constexpr unsigned int field_count = 0;
+        }; 
+    };
+
 /** Base class for all MMIO registers.
 
     Class R should define the following type:
