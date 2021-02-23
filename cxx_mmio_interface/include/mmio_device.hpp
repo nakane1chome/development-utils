@@ -70,8 +70,18 @@ template<uintptr_t BASE_ADDR, class R> class reg {
     datatype_t read(void) {
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
     }
-    void operator=(datatype_t value) {
+    datatype_t operator=(datatype_t value) {
         write(value);
+        return read();
+    }
+    void operator&=(datatype_t value) {
+        write(read()&value);
+    }
+    void operator|=(datatype_t value) {
+        write(read()|value);
+    }
+    void operator^=(datatype_t value) {
+        write(read()^value);
     }
 };
 
