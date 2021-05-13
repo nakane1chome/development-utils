@@ -4,3 +4,5 @@
 jinja2
 cmsis_svd
 pyyaml
+Pygments
+jinja2_highlight
