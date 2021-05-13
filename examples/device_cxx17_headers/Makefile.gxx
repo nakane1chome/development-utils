@@ -1,3 +1,4 @@
+# -*- Makefile -*-
 # ARM GNU Toolchain
 # https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
 # Assumes toolchain is in PATH
