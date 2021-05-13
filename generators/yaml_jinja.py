@@ -46,9 +46,10 @@ loader = jinja2.loaders.FileSystemLoader(args.templates)
 env = jinja2.Environment(loader=loader)
 
 jinja_filters.setup(env)
-for filter in args.filters:
-    filter_mod = imp.load_source('module.name', filter)
-    filter_mod.setup(env)
+if args.filters:
+    for filter in args.filters:
+        filter_mod = imp.load_source('module.name', filter)
+        filter_mod.setup(env)
 
 tmpl = env.get_template(args.template)
 with open(args.out, "w") as fout:
