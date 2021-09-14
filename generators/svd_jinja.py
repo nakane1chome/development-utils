@@ -87,7 +87,9 @@ for d_template in args.device:
     out_path = os.path.join(args.out_path, out_file)
     device_env = jinja2.Environment(loader=loader,
                                     extensions=['jinja2.ext.loopcontrols'])
+    jinja_filters.setup(device_env)
     tmpl = device_env.get_template(d_template)
+
     with open(out_path, "w") as fout:
         fout.write(tmpl.render(device=svd_dict, 
                                svd=args.svd, 
