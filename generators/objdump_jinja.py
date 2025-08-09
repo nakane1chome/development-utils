@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 #
 # A script to use a jinja template to generate code from any OBJDUMP output file.
 #
@@ -32,6 +32,7 @@ SECTION_RE=re.compile('Disassembly of section ([\w\.]+)\:')
 SYMBOL_RE=re.compile('([0-9a-fA-F]+)\s+\<(.+?)\>:')
 ADDR_RE=re.compile('([0-9a-fA-F]+):')
 FILE_RE=re.compile('(.*?):\s+file format (.*)')
+LINE_NUMBERS_RE=re.compile('(.*?)\:(\d+)$')
 
 def parse_objectdump(filename):
     objdump_data={}
@@ -43,6 +44,8 @@ def parse_objectdump(filename):
     objdump_data["by_section"]=by_section
     objdump_data["by_symbol"]=by_symbol
 
+    current_line = ("???",0)
+
     section=None
     with open(filename, 'r') as fin :
         addr=None
@@ -51,17 +54,19 @@ def parse_objectdump(filename):
             m1=SYMBOL_RE.match(line)
             m2=ADDR_RE.match(line)
             m3=FILE_RE.match(line)
+            m4=LINE_NUMBERS_RE.match(line)
 
             if m3 is not None:
                 objdump_data["file"] = m3.group(1)
                 objdump_data["format"] = m3.group(2)
-            elif m0 is not None:
-                section=m0.group(1)
-                by_section[section] = {"addr": None}
+            elif m4 is not None:
+                file_name=m4.group(1)
+                line_no=m4.group(2)
+                current_line=(file_name, os.path.basename(file_name), line_no, "%s:%s" % (os.path.basename(file_name), line_no) )
             elif m1 is not None:
                 addr=int(m1.group(1),16)
                 symbol=m1.group(2)
-                record = {"addr": addr,"symbol": symbol}
+                record = {"addr": addr,"symbol": symbol, "line_no" : current_line}
                 by_symbol[symbol] = record
                 by_addr[addr] = record
             elif m2 is not None:
@@ -78,6 +83,7 @@ def parse_objectdump(filename):
                     #by_addr["asm_args"]=[]
                     pass
                 by_addr[addr]["asm_code"]=" ".join(parts[1:])
+                by_addr[addr]["line_no"] = current_line
             elif line.strip() != "":
                 if addr is not None:
                     if "code" not in by_addr[addr]:
