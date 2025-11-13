@@ -6,3 +6,4 @@ cmsis_svd
 pyyaml
 Pygments
 jinja2_highlight
+systemrdl-compiler
