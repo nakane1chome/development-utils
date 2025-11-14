@@ -1,0 +1,6 @@
+{
+  "file": "{{ data.file }}",
+  "module_count": {{ data.modules | length }},
+  "first_module": "{{ data.modules[0].name }}",
+  "module_type": "{{ data.modules[0].type }}"
+}

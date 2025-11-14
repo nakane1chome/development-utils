@@ -1,0 +1,11 @@
+addrmap test_component {
+    desc = "Test component";
+    reg {
+        field {
+            sw = rw;
+            hw = r;
+            desc = "Test field";
+        } test_field[8] = 0;
+        desc = "Test register";
+    } test_reg @ 0x0;
+};
