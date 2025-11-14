@@ -1,5 +1,5 @@
 # Python dependencies
-# Install via 
+# Install via
 # pip install -r requirements.txt
 jinja2
 cmsis_svd
@@ -7,3 +7,9 @@ pyyaml
 Pygments
 jinja2_highlight
 systemrdl-compiler
+pytest
+
+# IDL parser - modern alternative to EOL OpenSplice DDS
+# Bridle: OMG IDL parser/AST library (actively maintained as of 2025)
+git+https://github.com/iguessthislldo/bridle.git
+
