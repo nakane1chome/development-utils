@@ -11,7 +11,7 @@ import re
 
 import jinja2
 import jinja_filters
-import imp
+import importlib.util
 import jinja2_highlight
 
 parser = argparse.ArgumentParser(
@@ -27,7 +27,6 @@ parser.add_argument('--templates', type=str, default=".",
 parser.add_argument('--filters', type=str, action='append', 
                     help='Additional filters to include. File should include a setup() method.')
 
-args = parser.parse_args()
 SECTION_RE=re.compile('Disassembly of section ([\w\.]+)\:')
 SYMBOL_RE=re.compile('([0-9a-fA-F]+)\s+\<(.+?)\>:')
 ADDR_RE=re.compile('([0-9a-fA-F]+):')
@@ -96,24 +95,30 @@ def parse_objectdump(filename):
                     if by_section[section]["addr"] is None:
                         by_section[section]["addr"]  = addr
     return objdump_data
-            
 
-objdump_data = parse_objectdump(args.objdump)
+def main(objdump_file, template_file, out_file, templates_path, filters_list):
+    objdump_data = parse_objectdump(objdump_file)
 
-# Template loader
-loader = jinja2.loaders.FileSystemLoader(args.templates)
+    # Template loader
+    loader = jinja2.loaders.FileSystemLoader(templates_path)
 
-env = jinja2.Environment(loader=loader,extensions=['jinja2_highlight.HighlightExtension'])
-env.extend(jinja2_highlight_cssclass = 'codehilite')
+    env = jinja2.Environment(loader=loader,extensions=['jinja2_highlight.HighlightExtension'])
+    env.extend(jinja2_highlight_cssclass = 'codehilite')
 
-jinja_filters.setup(env)
-if args.filters is not None:
-    for filter in args.filters:
-        filter_mod = imp.load_source('module.name', filter)
-        filter_mod.setup(env)
+    jinja_filters.setup(env)
+    if filters_list is not None:
+        for filter in filters_list:
+            spec = importlib.util.spec_from_file_location('module.name', filter)
+            filter_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(filter_mod)
+            filter_mod.setup(env)
 
-tmpl = env.get_template(args.template)
-with open(args.out, "w") as fout:
-    fout.write(tmpl.render(data=objdump_data))
-    fout.close()
+    tmpl = env.get_template(template_file)
+    with open(out_file, "w") as fout:
+        fout.write(tmpl.render(data=objdump_data))
+        fout.close()
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args.objdump, args.template, args.out, args.templates, args.filters)
 

@@ -4,7 +4,9 @@
 #
 # The root of the IDL document is made available as 'data' to the template.
 #
-# NOTE: Requires opensplice, and uses the opensplice idlpp command
+# NOTE: Requires OpenSplice DDS idlpp command (EOL - End of Life)
+# RECOMMENDED: Use idl_jinja_bridle.py instead, which uses the modern
+# bridle library (actively maintained as of 2025)
 
 import argparse
 import sys
@@ -12,7 +14,7 @@ import os
 
 import jinja2
 import jinja_filters
-import imp
+import importlib.util
 import subprocess
 
 import xml.etree.ElementTree as ET
@@ -30,9 +32,6 @@ parser.add_argument('--templates', type=str, default=".",
                     help='Path to templates')
 parser.add_argument('--filters', type=str, action='append', 
                     help='Additional filters to include. File should include a setup() method.')
-
-args = parser.parse_args()
-
 
 # https://stackoverflow.com/questions/7684333/converting-xml-to-dictionary-using-elementtree
 def _etree_to_dict(t):
@@ -53,7 +52,7 @@ def _etree_to_dict(t):
         if text.find("<MetaData")==0:
             metadata = ET.fromstring(text)
             text = _etree_to_dict(metadata)
-            
+
         if children or t.attrib:
             if text:
               d[t.tag]['#text'] = text
@@ -63,34 +62,47 @@ def _etree_to_dict(t):
 
 def _pre_process_idl(idl_path):
     """ Return all the data from an IDL file as a dictionary.
+    Requires OpenSplice DDS idlpp tool to be installed.
     """
-    out = subprocess.Popen(["idlpp", "-l", "pythondesc", idl_path], stdout=subprocess.PIPE).communicate()[0]
+    try:
+        out = subprocess.Popen(["idlpp", "-l", "pythondesc", idl_path],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE).communicate()[0]
+    except FileNotFoundError:
+        raise RuntimeError("OpenSplice DDS idlpp tool not found. Please install OpenSplice DDS.")
+
     if not out.startswith(b'<topics'):
         raise RuntimeError("Problem found with given IDL file:\n" + out.decode())
 
     doc = ET.fromstring(out)
     return _etree_to_dict(doc)
-    
-    
-idl_data=None
-try:
-    idl_data = _pre_process_idl(args.idl)
-except RuntimeError as exc:
-    print("ERROR: Parsing IDL file: " + args.idl)
-    print(exc)
 
-# Template loader
-loader = jinja2.loaders.FileSystemLoader(args.templates)
+def main(idl_file, template_file, out_file, templates_path, filters_list):
+    idl_data=None
+    try:
+        idl_data = _pre_process_idl(idl_file)
+    except RuntimeError as exc:
+        print("ERROR: Parsing IDL file: " + idl_file)
+        print(exc)
 
-env = jinja2.Environment(loader=loader)
+    # Template loader
+    loader = jinja2.loaders.FileSystemLoader(templates_path)
 
-jinja_filters.setup(env)
-if args.filters:
-    for filter in args.filters:
-        filter_mod = imp.load_source('module.name', filter)
-        filter_mod.setup(env)
+    env = jinja2.Environment(loader=loader)
 
-tmpl = env.get_template(args.template)
-with open(args.out, "w") as fout:
-    fout.write(tmpl.render(data=idl_data))
-    fout.close()
+    jinja_filters.setup(env)
+    if filters_list:
+        for filter in filters_list:
+            spec = importlib.util.spec_from_file_location('module.name', filter)
+            filter_mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(filter_mod)
+            filter_mod.setup(env)
+
+    tmpl = env.get_template(template_file)
+    with open(out_file, "w") as fout:
+        fout.write(tmpl.render(data=idl_data))
+        fout.close()
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args.idl, args.template, args.out, args.templates, args.filters)

@@ -52,46 +52,49 @@ parser.add_argument('--device', type=str,  action='append',
 parser.add_argument('--out-path', type=str,
                     help='Output File Path')
 
-args = parser.parse_args()
+def main(svd_file, templates_path, peripheral_templates, device_templates, out_path):
+    parser = SVDParser.for_xml_file(svd_file)
+    svd_dict = parser.get_device().to_dict()
+    svd_name = os.path.basename(svd_file)
 
-parser = SVDParser.for_xml_file(args.svd)
-svd_dict = parser.get_device().to_dict()
-svd_name = os.path.basename(args.svd)
+    # Filters
 
-# Filters
+    # Generate a file for each peripheral.
+    # Replace 'peripheral' with the name of the peripheral to derive the file name.
+    loader = jinja2.loaders.FileSystemLoader(templates_path)
 
-# Generate a file for each peripheral. 
-# Replace 'peripheral' with the name of the peripheral to derive the file name.
-loader = jinja2.loaders.FileSystemLoader(args.templates)
+    for p_template in peripheral_templates:
+        for p in svd_dict['peripherals']:
+            out_file = p_template.replace('peripheral', p['name'])
+            out_file_path = os.path.join(out_path, out_file)
+            peripheral_env = jinja2.Environment(loader=loader,
+                                                extensions=['jinja2.ext.loopcontrols'])
 
-for p_template in  args.peripheral:
-    for p in svd_dict['peripherals']: 
-        out_file = p_template.replace('peripheral', p['name'])
-        out_path = os.path.join(args.out_path, out_file)
-        peripheral_env = jinja2.Environment(loader=loader,
-                                            extensions=['jinja2.ext.loopcontrols'])
+            jinja_filters.setup(peripheral_env)
 
-        jinja_filters.setup(peripheral_env)
+            tmpl = peripheral_env.get_template(p_template)
+            with open(out_file_path, "w") as fout:
+                fout.write(tmpl.render(device=svd_dict,
+                                       peripheral=p,
+                                       svd=svd_file,
+                                       svd_name=svd_name))
+                fout.close()
 
-        tmpl = peripheral_env.get_template(p_template)
-        with open(out_path, "w") as fout:
-            fout.write(tmpl.render(device=svd_dict, 
-                                   peripheral=p,
-                                   svd=args.svd, 
+    for d_template in device_templates:
+        # Replace 'device' with the name of the device to derive the file name.
+        out_file = d_template.replace('device', svd_dict['name'])
+        out_file_path = os.path.join(out_path, out_file)
+        device_env = jinja2.Environment(loader=loader,
+                                        extensions=['jinja2.ext.loopcontrols'])
+        jinja_filters.setup(device_env)
+        tmpl = device_env.get_template(d_template)
+
+        with open(out_file_path, "w") as fout:
+            fout.write(tmpl.render(device=svd_dict,
+                                   svd=svd_file,
                                    svd_name=svd_name))
             fout.close()
 
-for d_template in args.device:
-    # Replace 'device' with the name of the device to derive the file name.
-    out_file = d_template.replace('device', svd_dict['name'])
-    out_path = os.path.join(args.out_path, out_file)
-    device_env = jinja2.Environment(loader=loader,
-                                    extensions=['jinja2.ext.loopcontrols'])
-    jinja_filters.setup(device_env)
-    tmpl = device_env.get_template(d_template)
-
-    with open(out_path, "w") as fout:
-        fout.write(tmpl.render(device=svd_dict, 
-                               svd=args.svd, 
-                               svd_name=svd_name))
-        fout.close()
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args.svd, args.templates, args.peripheral, args.device, args.out_path)

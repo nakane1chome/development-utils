@@ -39,8 +39,6 @@ parser.add_argument('--component', type=str,  action='append',
 parser.add_argument('--out-path', type=str,
                     help='Output File Path')
 
-args = parser.parse_args()
-
 # Filters
 
 def node_type(obj):
@@ -66,36 +64,39 @@ def setup_filters(env):
     env.filters['is_field'] = is_field
     env.filters['node_type'] = node_type
 
+def main(rdl_file, templates_path, component_templates, out_path):
+    rdlc = systemrdl.RDLCompiler()
+    rdlc.compile_file(rdl_file)
+    root_node = rdlc.elaborate()
 
+    component_name = os.path.basename(rdl_file)
+    addrmap_node = root_node.children()[0]
+    if addrmap_node != None and is_addrmap(addrmap_node):
+        component_name = addrmap_node.get_property("name")
 
-rdlc = systemrdl.RDLCompiler()
-rdlc.compile_file(args.rdl)
-root_node = rdlc.elaborate()
+    # Generate a file for each peripheral.
+    # Replace 'peripheral' with the name of the peripheral to derive the file name.
+    loader = jinja2.loaders.FileSystemLoader(templates_path)
 
-component_name = os.path.basename(args.rdl)
-addrmap_node = root_node.children()[0]
-if addrmap_node != None and is_addrmap(addrmap_node):
-    component_name = addrmap_node.get_property("name")
+    # Replace 'component' with the name of the component to derive the file name.
 
-# Generate a file for each peripheral. 
-# Replace 'peripheral' with the name of the peripheral to derive the file name.
-loader = jinja2.loaders.FileSystemLoader(args.templates)
+    for d_template in component_templates:
+        if d_template.find("component") < 0:
+            print(f"Warning: template file {d_template} does not include string 'component' ")
+        out_file = d_template.replace('component', component_name)
+        out_file_path = os.path.join(out_path, out_file)
+        component_env = jinja2.Environment(loader=loader,
+                                        extensions=['jinja2.ext.loopcontrols'])
+        jinja_filters.setup(component_env)
+        setup_filters(component_env)
+        tmpl = component_env.get_template(d_template)
 
-# Replace 'component' with the name of the component to derive the file name.
+        with open(out_file_path, "w") as fout:
+            fout.write(tmpl.render(root_node=root_node,
+                                   rld=rdl_file,
+                                   component_name=component_name))
+            fout.close()
 
-for d_template in args.component:
-    if d_template.find("component") < 0:
-        print(f"Warning: template file {d_template} does not include string 'component' ")
-    out_file = d_template.replace('component', component_name)
-    out_path = os.path.join(args.out_path, out_file)
-    component_env = jinja2.Environment(loader=loader,
-                                    extensions=['jinja2.ext.loopcontrols'])
-    jinja_filters.setup(component_env)
-    setup_filters(component_env)
-    tmpl = component_env.get_template(d_template)
-
-    with open(out_path, "w") as fout:
-        fout.write(tmpl.render(root_node=root_node, 
-                               rld=args.rdl, 
-                               component_name=component_name))
-        fout.close()
+if __name__ == "__main__":
+    args = parser.parse_args()
+    main(args.rdl, args.templates, args.component, args.out_path)
