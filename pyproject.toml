@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "development-utils"
+version = "0.1.0"
+description = "Code generation tools for embedded development (SVD, RDL, IDL, YAML)"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Phil"}
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Embedded Systems",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "jinja2",
+    "cmsis-svd",
+    "pyyaml",
+    "Pygments",
+    "jinja2_highlight",
+    "systemrdl-compiler",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://github.com/nakane1chome/development-utils"
+Repository = "https://github.com/nakane1chome/development-utils"
+Issues = "https://github.com/nakane1chome/development-utils/issues"
+
+[project.scripts]
+svd-jinja = "generators.svd_jinja:cli_main"
+rdl-jinja = "generators.rdl_jinja:cli_main"
+idl-jinja = "generators.idl_jinja:cli_main"
+idl-jinja-bridle = "generators.idl_jinja_bridle:cli_main"
+yaml-jinja = "generators.yaml_jinja:cli_main"
+objdump-jinja = "generators.objdump_jinja:cli_main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["generators*"]
+
+[tool.setuptools.package-data]
+generators = ["templates/*"]

@@ -10,7 +10,10 @@ import os
 import re
 
 import jinja2
-import jinja_filters
+try:
+    from . import jinja_filters
+except ImportError:
+    import jinja_filters
 import importlib.util
 import jinja2_highlight
 
@@ -118,7 +121,10 @@ def main(objdump_file, template_file, out_file, templates_path, filters_list):
         fout.write(tmpl.render(data=objdump_data))
         fout.close()
 
-if __name__ == "__main__":
+def cli_main():
     args = parser.parse_args()
     main(args.objdump, args.template, args.out, args.templates, args.filters)
+
+if __name__ == "__main__":
+    cli_main()
 

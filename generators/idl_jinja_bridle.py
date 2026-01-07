@@ -12,7 +12,10 @@ import sys
 import os
 
 import jinja2
-import jinja_filters
+try:
+    from . import jinja_filters
+except ImportError:
+    import jinja_filters
 import importlib.util
 
 from bridle import IdlParser
@@ -131,6 +134,9 @@ def main(idl_file, template_file, out_file, templates_path, filters_list):
         fout.close()
 
 
-if __name__ == "__main__":
+def cli_main():
     args = parser.parse_args()
     main(args.idl, args.template, args.out, args.templates, args.filters)
+
+if __name__ == "__main__":
+    cli_main()

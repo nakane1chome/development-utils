@@ -37,7 +37,10 @@ import cmsis_svd
 from cmsis_svd.parser import SVDParser
 
 import jinja2
-import jinja_filters
+try:
+    from . import jinja_filters
+except ImportError:
+    import jinja_filters
 
 parser = argparse.ArgumentParser(
     description='Generate code from CMSIS-SVD using JINJA templates.')
@@ -95,6 +98,9 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
                                    svd_name=svd_name))
             fout.close()
 
-if __name__ == "__main__":
+def cli_main():
     args = parser.parse_args()
     main(args.svd, args.templates, args.peripheral, args.device, args.out_path)
+
+if __name__ == "__main__":
+    cli_main()

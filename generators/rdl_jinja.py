@@ -26,7 +26,10 @@ import os
 import systemrdl
 
 import jinja2
-import jinja_filters
+try:
+    from . import jinja_filters
+except ImportError:
+    import jinja_filters
 
 parser = argparse.ArgumentParser(
     description='Generate code from CMSIS-SVD using JINJA templates.')
@@ -65,7 +68,7 @@ def setup_filters(env):
     env.filters['node_type'] = node_type
 
 def main(rdl_file, templates_path, component_templates, out_path):
-    rdlc = systemrdl.RDLCompiler()
+    rdlc = systemrdl.compiler.RDLCompiler()
     rdlc.compile_file(rdl_file)
     root_node = rdlc.elaborate()
 
@@ -97,6 +100,9 @@ def main(rdl_file, templates_path, component_templates, out_path):
                                    component_name=component_name))
             fout.close()
 
-if __name__ == "__main__":
+def cli_main():
     args = parser.parse_args()
     main(args.rdl, args.templates, args.component, args.out_path)
+
+if __name__ == "__main__":
+    cli_main()

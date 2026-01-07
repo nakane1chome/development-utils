@@ -10,10 +10,14 @@ import os
 
 import yaml
 
-import yaml_tags
+try:
+    from . import yaml_tags
+    from . import jinja_filters
+except ImportError:
+    import yaml_tags
+    import jinja_filters
 
 import jinja2
-import jinja_filters
 import importlib.util
 
 parser = argparse.ArgumentParser(
@@ -56,6 +60,9 @@ def main(yaml_file, template_file, out_file, templates_path, filters_list):
         fout.write(tmpl.render(data=yaml_data))
         fout.close()
 
-if __name__ == "__main__":
+def cli_main():
     args = parser.parse_args()
     main(args.yaml, args.template, args.out, args.templates, args.filters)
+
+if __name__ == "__main__":
+    cli_main()
