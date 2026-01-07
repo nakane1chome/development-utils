@@ -32,8 +32,9 @@
 import argparse
 import sys
 import os
+import importlib.util
 
-import cmsis_svd 
+import cmsis_svd
 from cmsis_svd.parser import SVDParser
 
 import jinja2
@@ -62,10 +63,20 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
 
     # Filters
 
+
     # Generate a file for each peripheral.
     # Replace 'peripheral' with the name of the peripheral to derive the file name.
     loader = jinja2.loaders.FileSystemLoader(templates_path)
 
+    # Load template-specific filters if available
+    template_filters = None
+    template_filters_path = os.path.join(templates_path, 'template_jinja_filters.py')
+    if os.path.exists(template_filters_path):
+        spec = importlib.util.spec_from_file_location("template_jinja_filters", template_filters_path)
+        template_filters = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(template_filters)
+    
+    # Filters
     for p_template in peripheral_templates:
         for p in svd_dict['peripherals']:
             out_file = p_template.replace('peripheral', p['name'])
@@ -74,6 +85,8 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
                                                 extensions=['jinja2.ext.loopcontrols'])
 
             jinja_filters.setup(peripheral_env)
+            if template_filters is not None:
+                template_filters.setup(peripheral_env)
 
             tmpl = peripheral_env.get_template(p_template)
             with open(out_file_path, "w") as fout:
