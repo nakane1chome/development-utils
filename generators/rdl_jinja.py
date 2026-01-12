@@ -1,27 +1,28 @@
 #!/bin/env python
-# 
+#
 # A script to use a jinja template to generate code from a System RDL register description
-# 
+#
 # Sytem RDL is a DSL for control & status register (CSR) definition.
-# 
+#
 # https://www.accellera.org/downloads/standards/systemrdl
 # https://github.com/systemrdl
-# 
+#
 # Jinja is a template engine for python
 # https://palletsprojects.com/p/jinja/
 # It's aimed at generating HTML etc, but we can use it to generate anything really.
-# 
+#
 # Usage:
 #
 # This script makes use of one types of templates, component templates only.
 #
 # - The top of the RDL tree is passed to component templates to generate a single file.
 # - Only one type of template needs to be passed to an invocation of this script.
-# 
+#
 
 import argparse
 import sys
 import os
+import re
 
 import systemrdl
 
@@ -87,6 +88,7 @@ def main(rdl_file, templates_path, component_templates, out_path):
         if d_template.find("component") < 0:
             print(f"Warning: template file {d_template} does not include string 'component' ")
         out_file = d_template.replace('component', component_name)
+        out_file = re.sub(r'\.jinja2$', '', out_file)
         out_file_path = os.path.join(out_path, out_file)
         component_env = jinja2.Environment(loader=loader,
                                         extensions=['jinja2.ext.loopcontrols'])

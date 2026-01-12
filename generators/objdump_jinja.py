@@ -27,7 +27,7 @@ parser.add_argument('out', type=str,
                     help='output File')
 parser.add_argument('--templates', type=str, default=".",
                     help='Path to templates')
-parser.add_argument('--filters', type=str, action='append', 
+parser.add_argument('--filters', type=str, action='append',
                     help='Additional filters to include. File should include a setup() method.')
 
 SECTION_RE=re.compile('Disassembly of section ([\w\.]+)\:')
@@ -127,4 +127,3 @@ def cli_main():
 
 if __name__ == "__main__":
     cli_main()
-

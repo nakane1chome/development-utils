@@ -9,8 +9,7 @@ SVD_IN=../extern/cmsis-svd/data/ARM_SAMPLE/ARM_Sample.svd
 
 python ../generators/svd_jinja.py \
     --out-path device_html/ \
-    --device device_address_map.html \
-    --peripheral peripheral_register_map.html \
+    --device device_address_map.html.jinja2 \
+    --peripheral peripheral_register_map.html.jinja2 \
     --templates ../templates/svd_jinja/ \
     ${SVD_IN}
-       

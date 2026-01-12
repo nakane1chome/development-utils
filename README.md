@@ -35,7 +35,7 @@ This package provides command-line tools for generating code from various embedd
 svd-jinja device.svd --templates templates/ --device device_template.html --out-path output/
 ```
 
-### RDL (SystemRDL Register Description)  
+### RDL (SystemRDL Register Description)
 ```bash
 rdl-jinja design.rdl --templates templates/ --component component_template.html --out-path output/
 ```
@@ -138,4 +138,3 @@ Run tests:
 ```bash
 pytest
 ```
-

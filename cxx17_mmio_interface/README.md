@@ -1,6 +1,6 @@
 A simple class library for interfacing to MMIO peripherals.
 
-Loosely based on the register access methods and MCAL shown in "Real Time C++" by Christopher Kormanyos. 
+Loosely based on the register access methods and MCAL shown in "Real Time C++" by Christopher Kormanyos.
 (https://www.amazon.com/Real-Time-Efficient-Object-Oriented-Microcontroller-Programming/dp/3662478099)
 
 There are two parts.
@@ -39,4 +39,3 @@ TODO:
  - Add some read/write protection.
  - Make use of ARM Cortex-M bit banding region.
  - Make better use of operators.
-

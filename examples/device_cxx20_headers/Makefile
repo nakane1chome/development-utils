@@ -9,7 +9,7 @@ CPPFLAGS=-I../../cxx20_mmio_interface/include/
 CXXFLAGS=-mcpu=cortex-m3 -g -O2 -std=c++20
 LDFLAGS=-nostartfiles
 
-all : test_CMSDK_CM3 test_CMSDK_CM3.disasm  test_single_write test_single_write.disasm 
+all : test_CMSDK_CM3 test_CMSDK_CM3.disasm  test_single_write test_single_write.disasm
 
 %.disasm : %
 	${CROSS_COMPILE}objdump -S $<  > $@

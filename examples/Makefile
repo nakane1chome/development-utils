@@ -27,7 +27,7 @@ all : ${EXAMPLES:%=.%-gen}
 
 .yaml_jinja-gen : \
 	./device_data/rpi.yaml \
-	../templates/yaml_jinja/dts_yaml.html
+	../templates/yaml_jinja/dts_yaml.html.jinja2
 
 
 clean :

@@ -20,14 +20,14 @@ namespace mmio_regs {
            {%- set r = r_info.1 %}
            {%- set count = r_info.2 %}
         /* {{r.description}} */
-        template<const std::uintptr_t BASE_ADDR> class {{r_name}} 
-            : public mmio_device::reg<BASE_ADDR, 
+        template<const std::uintptr_t BASE_ADDR> class {{r_name}}
+            : public mmio_device::reg<BASE_ADDR,
                                 mmio_param::{{peripheral.name}}::{{r_name}}_r> {
             {%- if r.fields %}
             public:
             {%- for f in r.fields %}
             /* {{f.description}} */
-            mmio_device::reg_field<BASE_ADDR, 
+            mmio_device::reg_field<BASE_ADDR,
                              mmio_param::{{peripheral.name}}::{{r_name}}_r,
                              mmio_param::{{peripheral.name}}::{{r_name}}::{{f.name}}_f> {{f.name}};
             {%- endfor %}

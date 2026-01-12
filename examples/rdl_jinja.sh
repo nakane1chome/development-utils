@@ -6,10 +6,10 @@ if [ ! -d rdl_html/ ] ; then
 fi
 RDL_PATH=../examples/system_rdl/
 
-for RDL_IN in tiny.rdl atxmega_spi.rdl cfg_registers.rdl; do 
+for RDL_IN in tiny.rdl atxmega_spi.rdl cfg_registers.rdl; do
    python ../generators/rdl_jinja.py \
     --out-path rdl_html/ \
-    --component component_map.html \
+    --component component_map.html.jinja2 \
     --templates ../templates/rdl_jinja/ \
     ${RDL_PATH}/${RDL_IN}
 done

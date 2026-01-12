@@ -15,4 +15,3 @@ pydbml
 # IDL parser - modern alternative to EOL OpenSplice DDS
 # Bridle: OMG IDL parser/AST library (actively maintained as of 2025)
 git+https://github.com/iguessthislldo/bridle.git
-

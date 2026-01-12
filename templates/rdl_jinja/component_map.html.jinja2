@@ -25,7 +25,7 @@
    {%- elif node | is_reg  %}
    <td>{{ "0x%08x" | format(node.address_offset) }}</td>
    {% else %}
-   <td>-</td> 
+   <td>-</td>
    {% endif %}
 {% endmacro %}
 

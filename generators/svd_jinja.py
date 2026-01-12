@@ -1,22 +1,22 @@
 #!/bin/env python
-# 
+#
 # A script to use a jinja template to generate code from an SVD device description
-# 
+#
 # CMSIS-SVD is an XML file format used by the Keil IDE and MCU on Eclipse
-# 
+#
 # https://www.keil.com/pack/doc/CMSIS/SVD/html/index.html
 # https://mcuoneclipse.com/tag/svd/
-# 
+#
 # It defines the registers, interrupts and cpu cores for many Cortex-M
 # devices. It's also been used by SiFive for their RISC-V devices.
 #
 # cmsis-svd is also the name of a handy python library that parses SVD.
 # https://github.com/posborne/cmsis-svd
-# 
+#
 # Jinja is a template engine for python
 # https://palletsprojects.com/p/jinja/
 # It's aimed at generating HTML etc, but we can use it to generate anything really.
-# 
+#
 # Usage:
 #
 # This script makes use of two types of templates, device templates and peripheral templates.
@@ -24,7 +24,7 @@
 # - The top of the SVD tree is passed to device templates to generate a single file.
 # - Each peripheral in a device is iterated over, and then passed to peripheral template. A file is generated for each peripheral.
 # - Only one type of template needs to be passed to an invocation of this script.
-# 
+#
 # The output file names are generated according to the template file name.
 # - for a device template 'device' in the template file name is replaced by the device name.
 # - for a peripheral template 'peripheral' in the template file name is replaced by the peripheral name.
@@ -32,6 +32,7 @@
 import argparse
 import sys
 import os
+import re
 import importlib.util
 
 import cmsis_svd
@@ -75,11 +76,12 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
         spec = importlib.util.spec_from_file_location("template_jinja_filters", template_filters_path)
         template_filters = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(template_filters)
-    
+
     # Filters
     for p_template in peripheral_templates:
         for p in svd_dict['peripherals']:
             out_file = p_template.replace('peripheral', p['name'])
+            out_file = re.sub(r'\.jinja2$', '', out_file)
             out_file_path = os.path.join(out_path, out_file)
             peripheral_env = jinja2.Environment(loader=loader,
                                                 extensions=['jinja2.ext.loopcontrols'])
@@ -99,6 +101,7 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
     for d_template in device_templates:
         # Replace 'device' with the name of the device to derive the file name.
         out_file = d_template.replace('device', svd_dict['name'])
+        out_file = re.sub(r'\.jinja2$', '', out_file)
         out_file_path = os.path.join(out_path, out_file)
         device_env = jinja2.Environment(loader=loader,
                                         extensions=['jinja2.ext.loopcontrols'])

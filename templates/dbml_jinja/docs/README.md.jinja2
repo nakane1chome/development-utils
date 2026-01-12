@@ -15,7 +15,7 @@ Auto-generated from DBML schema.
 | Name | Type | Constraints |
 |------|------|-------------|
 {% for column in table.columns %}
-| `{{ column.name }}` | {{ column.type }} | 
+| `{{ column.name }}` | {{ column.type }} |
    {%- if column.pk %} PK{% endif %}
    {%- if column.pk and column.unique  %},{% endif %}
    {%- if column.unique %} UNIQUE{% endif %}

@@ -24,7 +24,7 @@ int main(void) {
     {%- for f in r.fields %}
     // Field : {{f.name}}
     {{p.name}}_i.{{r.name}}.{{f.name}}.write(1);
-    auto {{p.name}}_{{r.name}}_{{f.name}}_v = {{p.name}}_i.{{r.name}}.{{f.name}}.read();    
+    auto {{p.name}}_{{r.name}}_{{f.name}}_v = {{p.name}}_i.{{r.name}}.{{f.name}}.read();
        {%- break %}
     {%- endfor%}
     {%- break %}

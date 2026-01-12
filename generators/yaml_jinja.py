@@ -30,7 +30,7 @@ parser.add_argument('out', type=str,
                     help='output File')
 parser.add_argument('--templates', type=str, default=".",
                     help='Path to templates')
-parser.add_argument('--filters', type=str, action='append', 
+parser.add_argument('--filters', type=str, action='append',
                     help='Additional filters to include. File should include a setup() method.')
 
 def main(yaml_file, template_file, out_file, templates_path, filters_list):

@@ -46,7 +46,7 @@ def compress_register_array(registers):
             return (reg['name'], reg, None)
         else :
             return (reg_name, reg, idx+1)
-        
+
     idx_registers = [split_reg_name(x) for x in registers]
     for reg, reg_name, idx in idx_registers:
         if idx is None :

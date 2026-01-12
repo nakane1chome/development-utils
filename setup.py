@@ -21,7 +21,7 @@ setuptools.setup(
     python_requires=">=3.8",
     install_requires=[
         "jinja2",
-        "cmsis-svd", 
+        "cmsis-svd",
         "pyyaml",
         "Pygments",
         "jinja2_highlight",
@@ -33,7 +33,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "svd-jinja=generators.svd_jinja:cli_main",
-            "rdl-jinja=generators.rdl_jinja:cli_main", 
+            "rdl-jinja=generators.rdl_jinja:cli_main",
             "idl-jinja=generators.idl_jinja:cli_main",
             "idl-jinja-bridle=generators.idl_jinja_bridle:cli_main",
             "yaml-jinja=generators.yaml_jinja:cli_main",

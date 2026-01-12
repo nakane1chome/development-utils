@@ -16,7 +16,7 @@ namespace mmio_device {
     datatype - common data type for all registers. e.g uint32_t
 
     Class R should define the following static constexpr member:
-    
+
     offset   - Byte offset from BASE_ADDR for register
 
  */
@@ -24,14 +24,14 @@ template<uintptr_t BASE_ADDR, class R> class reg {
     public :
 
     using datatype_t = typename R::datatype;
-    
+
     void write(datatype_t value) {
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
     }
-    void set(datatype_t value) { 
+    void set(datatype_t value) {
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) |= value;
     }
-    void clr(datatype_t value) { 
+    void clr(datatype_t value) {
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) &= ~value;
     }
     datatype_t read(void) {
@@ -42,16 +42,16 @@ template<uintptr_t BASE_ADDR, class R> class reg {
     }
 };
 
-/** Base class for all register fields 
+/** Base class for all register fields
 
     Class R is the same class passed to mmio_device::reg<>
 
     Class F should define the following type:
 
-    datatype - A datatype large enough to hold the field. e.g bool for single bits, uint8 for a 3 bit field. 
+    datatype - A datatype large enough to hold the field. e.g bool for single bits, uint8 for a 3 bit field.
 
     Class F should define the following static constexpr member:
-    
+
     bit_mask   - A mask for the location of the field within the parent register.
     bit_offset - The LSB of the field.
 
@@ -92,7 +92,7 @@ template<uintptr_t BASE_ADDR, class R, class F> class reg_field {
            *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = (r_datatype_t) value ;
         } else if constexpr (R::field_count == 1) {
            // Write to single field.
-           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = 
+           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) =
                ((r_datatype_t)value << F::bit_offset) & F::bit_mask;
         } else {
             // Read write modify
@@ -137,7 +137,7 @@ template<uintptr_t BASE_ADDR, class R, class F> class reg_field {
         __asm__ volatile ("amoor.w    %0, %1, (%2)"  /* read and write atomically */
                           : "=r" (dest) /* output: register %0 */
                           : "r" (value), "r" (addr)  /* input: register %1 */
-                          : /* clobbers: none */);       
+                          : /* clobbers: none */);
         return (dest & F::bit_mask) >> F::bit_offset;
 #else
         write(value|read());
