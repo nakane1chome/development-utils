@@ -1,0 +1,37 @@
+// Example DBML Schema
+// For testing the dbml_jinja.py generator
+
+Table hosts {
+  id varchar [pk]
+  created_at datetime [not null, default: `now()`]
+  hostname varchar [unique]
+
+  Note: 'Hosts that can execute operations'
+}
+
+Table tasks {
+  id varchar [pk]
+  created_at datetime [not null, default: `now()`]
+  name varchar
+  status varchar
+
+  Note: 'Tasks represent units of work'
+}
+
+Table operations {
+  id varchar [pk]
+  state varchar [not null]
+  state_counter integer [not null]
+  created_at datetime [not null, default: `now()`]
+  created_by_id varchar [not null]
+  assigned_to_id varchar
+
+  Note: 'Operation tracking simulation workflow'
+
+  Indexes {
+    (state, state_counter) [unique]
+  }
+}
+
+Ref: operations.assigned_to_id > hosts.id
+Ref: operations.created_by_id > tasks.id
