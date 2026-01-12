@@ -132,3 +132,9 @@ dmypy.json
 
 
 .direnv/
+.*-gen
+
+examples/device_cxx17_headers/test_single_write
+examples/device_cxx17_headers/test_CMSDK_CM3
+examples/device_cxx20_headers/test_single_write
+examples/device_cxx20_headers/test_CMSDK_CM3

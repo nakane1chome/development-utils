@@ -22,9 +22,11 @@ namespace irq {
 
     namespace {{device.name}} {
 {%- for p in device.peripherals %}
+{%- if p.interrupts %}
 {%- for i in p.interrupts %}
            static constexpr int {{"%25s"|format(p.name+"_"+i.name)}} = {{"0x%03x"|format(i.value)}};
 {%-endfor%}
+{%-endif%}
 {%-endfor%}
     }
 }

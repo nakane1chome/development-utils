@@ -7,7 +7,9 @@
 <table border=1>
 {%- for r in peripheral.registers %}
 <tr>
+{% if r.address_offset %}
 <td>{{r.name}}</td><td>{{"0x%08x"|format(r.address_offset)}}</td><td> {{ r.description }}</td></tr>
+{% endif %}
 </tr>
 {%- endfor %}
 </table>

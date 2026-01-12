@@ -4,26 +4,26 @@ test_single_write:     file format elf32-littlearm
 
 Disassembly of section .text:
 
-00008000 <main>:
+000100d8 <main>:
            // Write to single field.
            *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = 
                ((r_datatype_t)value << F::bit_offset) & F::bit_mask;
         } else {
             // Read write modify
             r_datatype_t reg_value = *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset);
-    8000:	4a03      	ldr	r2, [pc, #12]	; (8010 <main+0x10>)
+   100d8:	4a03      	ldr	r2, [pc, #12]	@ (100e8 <main+0x10>)
     // Peripheral: FPGAIO
     // Register: LED
     // Field : LED0
     FPGAIO_i.LED.LED0.write(1);
 
 }
-    8002:	2000      	movs	r0, #0
-    8004:	6813      	ldr	r3, [r2, #0]
+   100da:	2000      	movs	r0, #0
+   100dc:	6813      	ldr	r3, [r2, #0]
             reg_value = (((r_datatype_t)value << F::bit_offset) & F::bit_mask) | (reg_value & ~F::bit_mask);
-    8006:	f043 0301 	orr.w	r3, r3, #1
+   100de:	f043 0301 	orr.w	r3, r3, #1
             *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = reg_value;
-    800a:	6013      	str	r3, [r2, #0]
-    800c:	4770      	bx	lr
-    800e:	bf00      	nop
-    8010:	40028000 	.word	0x40028000
+   100e2:	6013      	str	r3, [r2, #0]
+   100e4:	4770      	bx	lr
+   100e6:	bf00      	nop
+   100e8:	40028000 	.word	0x40028000

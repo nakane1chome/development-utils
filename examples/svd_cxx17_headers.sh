@@ -14,4 +14,4 @@ SVD_IN=../extern/cmsis-svd/data/ARM_SAMPLE/CMSDK_CM3.svd
     --templates ../${VER}_mmio_interface/template/ \
     ${SVD_IN}
 
-make -C device_${VER}_headers/
+make -C device_${VER}_headers/ -f Makefile.gxx
