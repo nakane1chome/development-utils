@@ -5,8 +5,9 @@ Code generation tools for embedded development that use flexible user defined te
 ## Supported Input Formats
 
 - **[SVD (CMSIS System View Description)](https://www.keil.com/pack/doc/CMSIS/SVD/html/index.html)** - XML-based device descriptions from ARM Cortex-M and RISC-V devices
-- **[RDL (SystemRDL Register Description)](https://github.com/SystemRDL/systemrdl-compiler)** - Register and address map descriptions for hardware design  
+- **[RDL (SystemRDL Register Description)](https://github.com/SystemRDL/systemrdl-compiler)** - Register and address map descriptions for hardware design
 - **[IDL (Interface Definition Language)](https://www.omg.org/spec/IDL/)** - Interface definitions for distributed systems (supports IDL parsed by the [OpenSplice idlpp tool](https://download.zettascale.online/www/docs/OpenSplice/v7/html/ospl/IDLPreProcGuide/commandline.html) and [Bridle parser](https://github.com/iguessthislldo/bridle))
+- **[DBML (Database Markup Language)](https://dbml.dbdiagram.io/)** - Database schema definitions for generating ORM models, documentation, and migrations
 - **[Device Tree (DTS)](https://www.devicetree.org/)** - Hardware description format used in Linux and embedded systems (converted to YAML with dts2yaml)
 - **YAML Device Tree** - YAML-based device tree files and configuration data. Example of how to indirectly support Device Tree (DTS) via [YAML](https://www.konsulko.com/yaml-and-device-tree)
 - **Objdump Disassembly** - [GNU objdump](https://man7.org/linux/man-pages/man1/objdump.1.html) output for code analysis and documentation generation
@@ -45,6 +46,11 @@ idl-jinja interface.idl --template template.j2 --out output.txt --templates temp
 idl-jinja-bridle interface.idl --template template.j2 --out output.txt --templates templates/
 ```
 
+### DBML (Database Markup Language)
+```bash
+dbml-jinja schema.dbml templates/ output/
+```
+
 ### Device Tree (DTS)
 ```bash
 dts2yaml device.dts -o device.yaml  # Convert DTS to YAML
@@ -59,14 +65,51 @@ objdump-jinja disassembly.txt --template template.j2 --out output.html --templat
 ## Features
 
 - **SVD Templates**: Generate code/documentation from CMSIS-SVD files
-- **RDL Templates**: Generate HTML maps and documentation from SystemRDL files  
+- **RDL Templates**: Generate HTML maps and documentation from SystemRDL files
 - **IDL Processing**: Parse and generate code from Interface Definition Language files
+- **DBML Templates**: Generate SQLAlchemy models, Pydantic schemas, and documentation from database schemas
 - **YAML Processing**: Process device tree and configuration YAML files
 - **Objdump Parsing**: Generate documentation from disassembly listings
 
 ## Examples
 
+### Database Schema Code Generation (DBML)
+
+Generate SQLAlchemy models, Pydantic schemas, and documentation from DBML schemas:
+
+```bash
+# Generate SQLAlchemy models
+dbml-jinja schema.dbml templates/dbml_jinja/sqlalchemy output/models/
+
+# Generate documentation
+dbml-jinja schema.dbml templates/dbml_jinja/docs output/docs/
+```
+
+Example DBML schema:
+```dbml
+Table users {
+  id varchar [pk]
+  username varchar [not null]
+  email varchar [unique, not null]
+  created_at datetime [not null]
+}
+
+Table posts {
+  id varchar [pk]
+  title varchar [not null]
+  user_id varchar [ref: > users.id]
+}
+```
+
+See `examples/dbml_jinja.sh` and `templates/dbml_jinja/` for complete examples.
+
 ### C++ MMIO Register Access Classes
+
+Install `g++-arm-linux-gnueabi` to compile the generated examples and create dissasembly.
+
+~~~
+sudo apt-get install `g++-arm-linux-gnueabi`
+~~~
 
 The project also includes C++ templates for generating MMIO register access classes:
 
