@@ -1,0 +1,19 @@
+// Simple DBML schema for testing
+Table users {
+  id varchar [pk]
+  username varchar [not null]
+  email varchar [unique, not null]
+  created_at datetime [not null]
+
+  Note: 'User accounts table'
+}
+
+Table posts {
+  id varchar [pk]
+  title varchar [not null]
+  content text
+  user_id varchar [not null, ref: > users.id]
+  created_at datetime [not null]
+
+  Note: 'Blog posts table'
+}

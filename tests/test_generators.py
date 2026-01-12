@@ -21,6 +21,7 @@ import rdl_jinja
 import svd_jinja
 import idl_jinja
 import idl_jinja_bridle
+import dbml_jinja
 
 
 class TestYamlJinja:
@@ -213,6 +214,53 @@ class TestIdlJinjaBridle:
         assert data['module_count'] == 1
         assert data['first_module'] == 'HelloWorldData'
         assert data['module_type'] == 'ModuleNode'
+
+
+class TestDbmlJinja:
+    """Tests for dbml_jinja.py main() function."""
+
+    @pytest.mark.skipif(
+        not __import__('importlib.util').util.find_spec('pydbml'),
+        reason="pydbml library not installed"
+    )
+    def test_dbml_to_json(self, tmp_path):
+        """Test converting DBML to JSON output."""
+        # Setup paths
+        dbml_file = Path(__file__).parent / "fixtures" / "simple.dbml"
+        template_dir = Path(__file__).parent / "templates"
+        output_dir = tmp_path
+
+        # Create a template-specific directory with the test template
+        test_template_dir = tmp_path / "templates"
+        test_template_dir.mkdir()
+        import shutil
+        shutil.copy(
+            template_dir / "simple_dbml.json",
+            test_template_dir / "simple_dbml.json.jinja2"
+        )
+
+        # Run main
+        dbml_jinja.main(
+            str(dbml_file),
+            str(test_template_dir),
+            str(output_dir),
+            verbose=False
+        )
+
+        # Verify output exists and is valid JSON
+        out_file = output_dir / "simple_dbml.json"
+        assert out_file.exists()
+        with open(out_file) as f:
+            data = json.load(f)
+
+        # Verify content
+        assert data['table_count'] == 2
+        assert 'users' in data['tables']
+        assert 'posts' in data['tables']
+        assert data['first_table'] == 'users'
+        assert data['first_table_columns'] == 4
+        assert data['enum_count'] == 0
+        assert data['ref_count'] == 1
 
 
 if __name__ == "__main__":

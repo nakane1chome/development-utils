@@ -32,6 +32,7 @@ dependencies = [
     "Pygments",
     "jinja2_highlight",
     "systemrdl-compiler",
+    "pydbml",
 ]
 
 [project.optional-dependencies]
@@ -54,6 +55,7 @@ idl-jinja = "generators.idl_jinja:cli_main"
 idl-jinja-bridle = "generators.idl_jinja_bridle:cli_main"
 yaml-jinja = "generators.yaml_jinja:cli_main"
 objdump-jinja = "generators.objdump_jinja:cli_main"
+dbml-jinja = "generators.dbml_jinja:cli_main"
 
 [tool.setuptools.packages.find]
 where = ["."]
