@@ -71,6 +71,22 @@ objdump-jinja disassembly.txt --template template.j2 --out output.html --templat
 - **YAML Processing**: Process device tree and configuration YAML files
 - **Objdump Parsing**: Generate documentation from disassembly listings
 
+## Template Files
+
+Template files use the **Jinja2 templating engine** and should have the `.jinja2` extension to clearly identify them as templates. For example:
+
+- `device_template.html.jinja2` - Template that generates HTML output
+- `peripheral_mmio_regs.hpp.jinja2` - Template that generates C++ header files
+- `component_map.html.jinja2` - Template for RDL component maps
+
+When generating output files, the `.jinja2` extension is automatically stripped from the filename. The output filename is derived from the template filename by:
+1. Replacing placeholder text (e.g., `device`, `peripheral`, `component`) with actual names
+2. Removing the `.jinja2` suffix
+
+**Example:** Template `peripheral_mmio_regs.hpp.jinja2` generates `TIMER0_mmio_regs.hpp`, `UART0_mmio_regs.hpp`, etc.
+
+This convention makes it easy to identify template files while ensuring generated files have the correct extensions for their content type.
+
 ## Examples
 
 ### Database Schema Code Generation (DBML)
