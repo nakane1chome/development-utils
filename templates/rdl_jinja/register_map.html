@@ -1,0 +1,37 @@
+<html>
+<head>
+<title> Register map for {{ device_name }}</title>
+</head>
+<body>
+<h1> Register map for {{ device_name }}</h1>
+<table border=1>
+{%- for addr_map in root_node.children() %}
+   <tr>
+
+   <th>
+   {%- if addr_map | is_addrmap %}
+   <a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.AddrmapNode>AddrmapNode</a>
+   {%- else %}
+      Unknown node! {{addr_map}}
+   {% endif %}
+   </th>
+   <th colspan=2>{{addr_map.get_property("name")}}</th>
+   <th> {{ addr_map.get_property("desc") }}</th></th>
+   </tr>
+
+   {%- for reg in addr_map.children() %}
+   <tr>
+   {%- if reg | is_reg %}
+   <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.RegNode>RegNode</a></th>
+   <td>{{reg.get_property("name")}}</td>
+   <td>{{"0x08x" | format reg.address_offset}}</td>
+   <td> {{ reg.get_html_desc() }}</td>
+   {%- else %}
+   <th colspan=4>Unknown node! {{reg}}</th>
+   {% endif %}
+   </tr>
+   {%- endfor %}
+{%- endfor %}
+</table>
+</body>
+</html>
