@@ -1,0 +1,113 @@
+/*
+ * Register definitions for {{peripheral.name}}.
+ * Generated from SVD file: {{svd_name}}.
+ * SPDX-License-Identifier: MIT
+ *
+ * DO NOT EDIT - This file is auto-generated.
+ */
+
+#ifndef {{peripheral.name|upper}}_REGS_H
+#define {{peripheral.name|upper}}_REGS_H
+
+#include <stdint.h>
+#include "svd_reg_macros.h"
+
+/*
+ * Peripheral: {{peripheral.name}}
+ * {{(peripheral.description or 'No description') | wordwrap(70) | replace('\n', '\n * ')}}
+ */
+
+{%- set compressed_registers = peripheral | get_compressed_registers | compress_register_array %}
+
+/* ============================================================================
+ * Register Offsets
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET    ({{"0x%04X"|format(r.address_offset)}})
+{%- endfor %}
+
+/* ============================================================================
+ * Register Reset Values
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+{%- set reg_width = r.size if r.size is defined else device.width %}
+{%- if r.reset_value is defined and r.reset_value is not none %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_RESET    ({{"0x%0*X"|format((reg_width // 4)|int, r.reset_value)}}U)
+{%- else %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_RESET    (0x0U)
+{%- endif %}
+{%- endfor %}
+
+/* ============================================================================
+ * Register Defined Masks (which bits are implemented)
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+{%- set reg_width = r.size if r.size is defined else device.width %}
+{%- if r.fields %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_MASK    ({% for f in r.fields %}{{f.bit_offset|format_mask(f.bit_width)}}{% if not loop.last %} | {% endif %}{% endfor %})
+{%- else %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_MASK    ({{'0x%X' % ((2 ** reg_width) - 1)}}U)
+{%- endif %}
+{%- endfor %}
+
+/* ============================================================================
+ * Register Access Modes
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+{%- set access = r.access | default('read-write') %}
+{%- if access == 'read-only' %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_RO
+{%- elif access == 'write-only' %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_WO
+{%- else %}
+#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_RW
+{%- endif %}
+{%- endfor %}
+
+/* ============================================================================
+ * Field Definitions
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+{%- if r.fields %}
+
+/* ----------------------------------------------------------------------------
+ * {{r_name}}: {{(r.description or 'No description') | truncate(60)}}
+ * ----------------------------------------------------------------------------
+ */
+{%- for f in r.fields %}
+
+/* Field: {{f.name}}
+ * {{(f.description or 'No description') | wordwrap(60) | replace('\n', '\n * ')}}
+ */
+#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT    ({{f.bit_offset}}U)
+#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_WIDTH    ({{f.bit_width}}U)
+#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK     ({{f.bit_offset|format_mask(f.bit_width)}})
+
+/* Extract {{f.name}} field from register value */
+#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_GET(reg_val) \
+    (((reg_val) & {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK) >> {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT)
+
+/* Insert {{f.name}} field into register value */
+#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SET(reg_val, field_val) \
+    (((reg_val) & ~{{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK) | \
+     (((field_val) << {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT) & {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK))
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
+
+#endif /* {{peripheral.name|upper}}_REGS_H */

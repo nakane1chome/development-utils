@@ -131,6 +131,7 @@ The project also includes C++ templates for generating MMIO register access clas
 
 - C++17 MMIO interface in `cxx17_mmio_interface/`
 - C++20 MMIO interface in `cxx20_mmio_interface/`
+- C QEMU device stubs in `c_qemu_svd_stubs/`
 
 See:
 - https://www.shincbm.com/embedded/2020/08/30/cxx-reg-access.html
@@ -142,6 +143,28 @@ Based on this tooling, generation of C, C++ and Rust register access code:
 
 - https://www.five-embeddev.com/code/2020/11/18/csr-access/
 - https://github.com/five-embeddev/riscv-csr-access
+
+### C QEMU Device Model Stubs
+
+Generate plain C code for QEMU device model implementations from SVD files:
+
+```bash
+svd-jinja device.svd \
+    --templates c_qemu_svd_stubs/template/ \
+    --device device.h.jinja2 \
+    --peripheral peripheral_regs.h.jinja2 \
+    --peripheral peripheral_qemu_stub.c.jinja2 \
+    --peripheral peripheral_qemu_stub.h.jinja2 \
+    --out-path output/
+```
+
+Generated files include:
+- `<device>.h` - Device base addresses and IRQ numbers
+- `<peripheral>_regs.h` - Register offsets, field masks, and accessor macros
+- `<peripheral>_qemu_stub.c` - QEMU device model with read/write handlers
+- `<peripheral>_qemu_stub.h` - QEMU device header
+
+The templates use C preprocessor macros instead of C++ constexpr/templates, making them suitable for QEMU's C codebase. See `examples/svd_c_qemu_stubs.sh` for a complete example.
 
 ## Development
 

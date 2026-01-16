@@ -1,0 +1,188 @@
+/*
+ * QEMU device model stub for {{peripheral.name}}.
+ * Generated from SVD file: {{svd_name}}.
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * This is a generated stub - implement the TODO sections for actual behavior.
+ */
+
+#include "qemu/osdep.h"
+#include "qemu/log.h"
+#include "qemu/module.h"
+#include "hw/sysbus.h"
+#include "hw/irq.h"
+#include "hw/qdev-properties.h"
+
+#include "{{peripheral.name}}_regs.h"
+
+{%- set compressed_registers = peripheral | get_compressed_registers | compress_register_array %}
+{%- set reg_count = compressed_registers | length %}
+
+#define TYPE_{{peripheral.name|upper}}    "{{peripheral.name|lower}}"
+OBJECT_DECLARE_SIMPLE_TYPE({{peripheral.name}}State, {{peripheral.name|upper}})
+
+/*
+ * {{peripheral.name}} device state
+ * {{(peripheral.description or 'No description') | wordwrap(70) | replace('\n', '\n * ')}}
+ */
+struct {{peripheral.name}}State {
+    /* Parent object */
+    SysBusDevice parent_obj;
+
+    /* Memory region for MMIO */
+    MemoryRegion iomem;
+
+    /* Interrupt output */
+    qemu_irq irq;
+
+    /* Register storage */
+    {%- for r_info in compressed_registers %}
+    {%- set r_name = r_info.0 %}
+    {%- set r = r_info.1 %}
+    {%- set reg_width = r.size if r.size is defined else device.width %}
+    {{reg_width|to_c_type}} {{r_name|lower}};    /* {{(r.description or '') | truncate(40)}} */
+    {%- endfor %}
+};
+
+/*
+ * Register read handler
+ */
+static uint64_t {{peripheral.name|lower}}_read(void *opaque, hwaddr offset, unsigned size)
+{
+    {{peripheral.name}}State *s = {{peripheral.name|upper}}(opaque);
+    uint64_t value = 0;
+    (void)size;  /* Unused */
+
+    switch (offset) {
+    {%- set seen_read_offsets = [] %}
+    {%- for r_info in compressed_registers %}
+    {%- set r_name = r_info.0 %}
+    {%- set r = r_info.1 %}
+    {%- set access = r.access | default('read-write') %}
+    {%- if access != 'write-only' and r.address_offset not in seen_read_offsets %}
+    {%- set _ = seen_read_offsets.append(r.address_offset) %}
+    case {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET:
+        value = s->{{r_name|lower}};
+        break;
+    {%- endif %}
+    {%- endfor %}
+    default:
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "{{peripheral.name}}: read from unknown register 0x%"HWADDR_PRIx"\n",
+                      offset);
+        break;
+    }
+
+    return value;
+}
+
+/*
+ * Register write handler
+ */
+static void {{peripheral.name|lower}}_write(void *opaque, hwaddr offset,
+                             uint64_t value, unsigned size)
+{
+    {{peripheral.name}}State *s = {{peripheral.name|upper}}(opaque);
+    (void)size;  /* Unused */
+
+    switch (offset) {
+    {%- set seen_write_offsets = [] %}
+    {%- for r_info in compressed_registers %}
+    {%- set r_name = r_info.0 %}
+    {%- set r = r_info.1 %}
+    {%- set access = r.access | default('read-write') %}
+    {%- set modified_write = r.modified_write_values | default('modify') %}
+    {%- if access != 'read-only' and r.address_offset not in seen_write_offsets %}
+    {%- set _ = seen_write_offsets.append(r.address_offset) %}
+    case {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET:
+        {%- if modified_write == 'oneToClear' %}
+        /* Write-1-to-clear: clear bits where value has 1s */
+        s->{{r_name|lower}} &= ~value;
+        {%- elif modified_write == 'oneToSet' %}
+        /* Write-1-to-set: set bits where value has 1s */
+        s->{{r_name|lower}} |= value;
+        {%- elif modified_write == 'oneToToggle' %}
+        /* Write-1-to-toggle: toggle bits where value has 1s */
+        s->{{r_name|lower}} ^= value;
+        {%- else %}
+        s->{{r_name|lower}} = value & {{peripheral.name|upper}}_{{r_name|upper}}_MASK;
+        {%- endif %}
+        break;
+    {%- endif %}
+    {%- endfor %}
+    default:
+        qemu_log_mask(LOG_GUEST_ERROR,
+                      "{{peripheral.name}}: write to unknown register 0x%"HWADDR_PRIx"\n",
+                      offset);
+        break;
+    }
+
+    /* TODO: Add side-effect handling and interrupt logic here */
+}
+
+static const MemoryRegionOps {{peripheral.name|lower}}_ops = {
+    .read = {{peripheral.name|lower}}_read,
+    .write = {{peripheral.name|lower}}_write,
+    .endianness = DEVICE_LITTLE_ENDIAN,
+    .impl = {
+        .min_access_size = 4,
+        .max_access_size = 4,
+    },
+};
+
+/*
+ * Device reset
+ */
+static void {{peripheral.name|lower}}_reset(DeviceState *dev)
+{
+    {{peripheral.name}}State *s = {{peripheral.name|upper}}(dev);
+
+    /* Reset all registers to their default values */
+    {%- for r_info in compressed_registers %}
+    {%- set r_name = r_info.0 %}
+    s->{{r_name|lower}} = {{peripheral.name|upper}}_{{r_name|upper}}_RESET;
+    {%- endfor %}
+}
+
+/*
+ * Device realization
+ */
+static void {{peripheral.name|lower}}_realize(DeviceState *dev, Error **errp)
+{
+    {{peripheral.name}}State *s = {{peripheral.name|upper}}(dev);
+    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+    (void)errp;  /* Unused in stub */
+
+    memory_region_init_io(&s->iomem, OBJECT(s), &{{peripheral.name|lower}}_ops, s,
+                          TYPE_{{peripheral.name|upper}}, 0x1000);
+    sysbus_init_mmio(sbd, &s->iomem);
+
+    sysbus_init_irq(sbd, &s->irq);
+}
+
+/*
+ * Device class initialization
+ */
+static void {{peripheral.name|lower}}_class_init(ObjectClass *klass, void *data)
+{
+    DeviceClass *dc = DEVICE_CLASS(klass);
+    (void)data;  /* Unused */
+
+    dc->realize = {{peripheral.name|lower}}_realize;
+    dc->reset = {{peripheral.name|lower}}_reset;
+    dc->desc = "{{(peripheral.description or peripheral.name + ' peripheral') | truncate(60)}}";
+}
+
+static const TypeInfo {{peripheral.name|lower}}_info = {
+    .name          = TYPE_{{peripheral.name|upper}},
+    .parent        = TYPE_SYS_BUS_DEVICE,
+    .instance_size = sizeof({{peripheral.name}}State),
+    .class_init    = {{peripheral.name|lower}}_class_init,
+};
+
+static void {{peripheral.name|lower}}_register_types(void)
+{
+    type_register_static(&{{peripheral.name|lower}}_info);
+}
+
+type_init({{peripheral.name|lower}}_register_types)

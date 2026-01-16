@@ -14,6 +14,10 @@ all : ${EXAMPLES:%=.%-gen}
 .svd_cxx20_headers-gen: \
 	${wildcard ../cxx20_mmio_interface/template/*}
 
+.svd_c_qemu_stubs-gen: \
+	${wildcard ../c_qemu_svd_stubs/template/*} \
+	${wildcard ../c_qemu_svd_stubs/include/*}
+
 .dbml_jinja-gen : \
 	dbml/example_schema.dbml \
 	${wildcard ../../templates/dbml_jinja/docs/*}  \
