@@ -8,10 +8,9 @@
 # Alternative to OpenSplice DDS idlpp which is EOL
 
 import argparse
-import sys
-import os
 
 import jinja2
+
 try:
     from . import jinja_filters
 except ImportError:
@@ -21,17 +20,18 @@ import importlib.util
 from bridle import IdlParser
 
 parser = argparse.ArgumentParser(
-    description='Generate code from IDL using JINJA templates (using bridle parser).')
-parser.add_argument('idl', type=str,
-                    help='IDL File')
-parser.add_argument('template', type=str,
-                    help='template File')
-parser.add_argument('out', type=str,
-                    help='output File')
-parser.add_argument('--templates', type=str, default=".",
-                    help='Path to templates')
-parser.add_argument('--filters', type=str, action='append',
-                    help='Additional filters to include. File should include a setup() method.')
+    description="Generate code from IDL using JINJA templates (using bridle parser)."
+)
+parser.add_argument("idl", type=str, help="IDL File")
+parser.add_argument("template", type=str, help="template File")
+parser.add_argument("out", type=str, help="output File")
+parser.add_argument("--templates", type=str, default=".", help="Path to templates")
+parser.add_argument(
+    "--filters",
+    type=str,
+    action="append",
+    help="Additional filters to include. File should include a setup() method.",
+)
 
 
 def _ast_to_dict(node):
@@ -41,31 +41,30 @@ def _ast_to_dict(node):
     easily used in Jinja templates.
     """
     result = {
-        'type': type(node).__name__,
+        "type": type(node).__name__,
     }
 
     # Add name if present
-    if hasattr(node, 'name') and node.name is not None:
-        result['name'] = node.name
+    if hasattr(node, "name") and node.name is not None:
+        result["name"] = node.name
 
     # Add scoped name if present
-    if hasattr(node, 'scoped_name') and node.scoped_name is not None:
-        result['scoped_name'] = str(node.scoped_name)
+    if hasattr(node, "scoped_name") and node.scoped_name is not None:
+        result["scoped_name"] = str(node.scoped_name)
 
     # Recursively process children
-    if hasattr(node, 'children') and node.children:
-        result['children'] = [_ast_to_dict(child) for child in node.children]
+    if hasattr(node, "children") and node.children:
+        result["children"] = [_ast_to_dict(child) for child in node.children]
 
     # Add type-specific attributes
     node_type = type(node).__name__
 
-    if node_type == 'PrimitiveNode':
+    if node_type == "PrimitiveNode":
         # Primitive types like i32, s8, etc.
-        result['primitive_type'] = str(node)
-    elif node_type == 'FieldNode':
+        result["primitive_type"] = str(node)
+    elif node_type == "FieldNode" and hasattr(node, "children") and len(node.children) > 0:
         # Struct fields
-        if hasattr(node, 'children') and len(node.children) > 0:
-            result['field_type'] = _ast_to_dict(node.children[0])
+        result["field_type"] = _ast_to_dict(node.children[0])
 
     return result
 
@@ -86,14 +85,11 @@ def _parse_idl_with_bridle(idl_path):
         # Convert the first tree to dictionary
         tree = ast_trees[0]
 
-        result = {
-            'file': idl_path,
-            'modules': []
-        }
+        result = {"file": idl_path, "modules": []}
 
         # Process all top-level children (usually modules)
         for child in tree.children:
-            result['modules'].append(_ast_to_dict(child))
+            result["modules"].append(_ast_to_dict(child))
 
         return result
 
@@ -101,9 +97,9 @@ def _parse_idl_with_bridle(idl_path):
         raise RuntimeError(
             "Bridle library not found. Install with: "
             "pip install git+https://github.com/iguessthislldo/bridle.git"
-        )
+        ) from None
     except Exception as e:
-        raise RuntimeError(f"Error parsing IDL file {idl_path}: {str(e)}")
+        raise RuntimeError(f"Error parsing IDL file {idl_path}: {str(e)}") from e
 
 
 def main(idl_file, template_file, out_file, templates_path, filters_list):
@@ -123,7 +119,7 @@ def main(idl_file, template_file, out_file, templates_path, filters_list):
     jinja_filters.setup(env)
     if filters_list:
         for filter in filters_list:
-            spec = importlib.util.spec_from_file_location('module.name', filter)
+            spec = importlib.util.spec_from_file_location("module.name", filter)
             filter_mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(filter_mod)
             filter_mod.setup(env)
@@ -137,6 +133,7 @@ def main(idl_file, template_file, out_file, templates_path, filters_list):
 def cli_main():
     args = parser.parse_args()
     main(args.idl, args.template, args.out, args.templates, args.filters)
+
 
 if __name__ == "__main__":
     cli_main()

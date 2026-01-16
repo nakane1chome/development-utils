@@ -69,9 +69,7 @@ class DBMLJinjaGenerator:
         )  # Simple singularization
 
         # Relationship naming filter - removes _id suffix from FK column names
-        self.env.filters["relationship_name"] = lambda s: (
-            s[:-3] if s.endswith("_id") else s
-        )
+        self.env.filters["relationship_name"] = lambda s: (s[:-3] if s.endswith("_id") else s)
 
         # Junction table detection - checks if all PK columns are also FKs
         def is_junction_table(table):
@@ -93,7 +91,7 @@ class DBMLJinjaGenerator:
         # Get enum values as list
         def get_enum_values(enum_obj):
             """Get list of enum value names."""
-            if hasattr(enum_obj, 'items'):
+            if hasattr(enum_obj, "items"):
                 return [item.name for item in enum_obj.items]
             return []
 
@@ -102,7 +100,7 @@ class DBMLJinjaGenerator:
         # Get enum name
         def get_enum_name(column_type):
             """Get enum name from column type."""
-            if hasattr(column_type, 'name'):
+            if hasattr(column_type, "name"):
                 return column_type.name
             return str(column_type)
 
@@ -112,7 +110,9 @@ class DBMLJinjaGenerator:
         self.env.filters["to_python_type"] = self._to_python_type
         self.env.filters["to_sqlalchemy_type"] = self._to_sqlalchemy_type
         self.env.filters["names_to_list"] = lambda objs: ", ".join([obj.name for obj in objs])
-        self.env.filters["quoted_names_to_list"] = lambda objs: ", ".join(['"'+obj.name+'"' for obj in objs])
+        self.env.filters["quoted_names_to_list"] = lambda objs: ", ".join(
+            ['"' + obj.name + '"' for obj in objs]
+        )
 
     def _to_python_type(self, dbml_type) -> str:
         """Convert DBML type to Python type."""
@@ -323,13 +323,9 @@ def cli_main():
         description="Generate code from DBML schema using Jinja2 templates"
     )
     parser.add_argument("dbml_file", type=Path, help="Path to DBML schema file")
-    parser.add_argument(
-        "template_dir", type=Path, help="Directory containing Jinja2 templates"
-    )
+    parser.add_argument("template_dir", type=Path, help="Directory containing Jinja2 templates")
     parser.add_argument("output_dir", type=Path, help="Output directory for generated files")
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose logging"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
     main(args.dbml_file, args.template_dir, args.output_dir, args.verbose)

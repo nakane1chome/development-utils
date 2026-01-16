@@ -10,19 +10,23 @@ This package provides generators for:
 """
 
 from ._version import __version__
+
 __author__ = "Phil"
 
-from . import svd_jinja
-from . import rdl_jinja
-from . import idl_jinja
-from . import idl_jinja_bridle
-from . import yaml_jinja
-from . import objdump_jinja
-from . import riscv_csr
-from . import jinja_filters
-from . import yaml_tags
+from . import (
+    idl_jinja,
+    idl_jinja_bridle,
+    jinja_filters,
+    objdump_jinja,
+    rdl_jinja,
+    riscv_csr,
+    svd_jinja,
+    yaml_jinja,
+    yaml_tags,
+)
 
 __all__ = [
+    "__version__",
     "svd_jinja",
     "rdl_jinja",
     "idl_jinja",

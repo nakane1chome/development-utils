@@ -1,7 +1,15 @@
 """Operations model."""
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, PrimaryKeyConstraint, UniqueConstraint
+
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from ..base import Base
@@ -19,7 +27,7 @@ class Operations(Base):
     created_by_id = Column(String, ForeignKey("tasks.id"), nullable=False)
     assigned_to_id = Column(String, ForeignKey("hosts.id"), nullable=True)
 
-    __table_args__ = (        UniqueConstraint("state", "state_counter"),    )
+    __table_args__ = (UniqueConstraint("state", "state_counter"),)
     # Relationships (1)
     assigned_to = relationship("Hosts", foreign_keys=[assigned_to_id], back_populates="operations")
     created_by = relationship("Tasks", foreign_keys=[created_by_id], back_populates="operations")

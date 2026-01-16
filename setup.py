@@ -2,16 +2,17 @@
 Setup script for development-utils - Backward compatibility wrapper.
 """
 
-import setuptools
 from pathlib import Path
 
+import setuptools
+
 this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text(encoding='utf-8')
+long_description = (this_directory / "README.md").read_text(encoding="utf-8")
 
 setuptools.setup(
     name="development-utils",
     use_scm_version={"fallback_version": "0.1.0"},
-    setup_requires=['setuptools_scm'],
+    setup_requires=["setuptools_scm"],
     description="Code generation tools for embedded development",
     long_description=long_description,
     long_description_content_type="text/markdown",

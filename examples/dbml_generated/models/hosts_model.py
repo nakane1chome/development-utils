@@ -1,7 +1,12 @@
 """Hosts model."""
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, PrimaryKeyConstraint, UniqueConstraint
+
+from sqlalchemy import (
+    Column,
+    DateTime,
+    String,
+)
 from sqlalchemy.orm import relationship
 
 from ..base import Base

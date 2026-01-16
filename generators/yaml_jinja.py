@@ -5,37 +5,34 @@
 # The root of the YAML document is made available as 'data' to the template.
 
 import argparse
-import sys
-import os
 
 import yaml
 
 try:
-    from . import yaml_tags
     from . import jinja_filters
 except ImportError:
-    import yaml_tags
     import jinja_filters
 
-import jinja2
 import importlib.util
 
-parser = argparse.ArgumentParser(
-    description='Generate code from YAML using JINJA templates.')
-parser.add_argument('yaml', type=str,
-                    help='YAML File')
-parser.add_argument('template', type=str,
-                    help='template File')
-parser.add_argument('out', type=str,
-                    help='output File')
-parser.add_argument('--templates', type=str, default=".",
-                    help='Path to templates')
-parser.add_argument('--filters', type=str, action='append',
-                    help='Additional filters to include. File should include a setup() method.')
+import jinja2
+
+parser = argparse.ArgumentParser(description="Generate code from YAML using JINJA templates.")
+parser.add_argument("yaml", type=str, help="YAML File")
+parser.add_argument("template", type=str, help="template File")
+parser.add_argument("out", type=str, help="output File")
+parser.add_argument("--templates", type=str, default=".", help="Path to templates")
+parser.add_argument(
+    "--filters",
+    type=str,
+    action="append",
+    help="Additional filters to include. File should include a setup() method.",
+)
+
 
 def main(yaml_file, template_file, out_file, templates_path, filters_list):
-    yaml_data=None
-    with open(yaml_file, 'r') as fin :
+    yaml_data = None
+    with open(yaml_file) as fin:
         try:
             yaml_data = yaml.full_load(fin)
         except yaml.YAMLError as exc:
@@ -50,7 +47,7 @@ def main(yaml_file, template_file, out_file, templates_path, filters_list):
     jinja_filters.setup(env)
     if filters_list:
         for filter in filters_list:
-            spec = importlib.util.spec_from_file_location('module.name', filter)
+            spec = importlib.util.spec_from_file_location("module.name", filter)
             filter_mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(filter_mod)
             filter_mod.setup(env)
@@ -60,9 +57,11 @@ def main(yaml_file, template_file, out_file, templates_path, filters_list):
         fout.write(tmpl.render(data=yaml_data))
         fout.close()
 
+
 def cli_main():
     args = parser.parse_args()
     main(args.yaml, args.template, args.out, args.templates, args.filters)
+
 
 if __name__ == "__main__":
     cli_main()

@@ -17,3 +17,4 @@ pydbml
 git+https://github.com/iguessthislldo/bridle.git
 
 pre-commit
+ruff

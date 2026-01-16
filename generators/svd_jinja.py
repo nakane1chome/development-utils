@@ -30,32 +30,25 @@
 # - for a peripheral template 'peripheral' in the template file name is replaced by the peripheral name.
 
 import argparse
-import sys
+import importlib.util
 import os
 import re
-import importlib.util
-
-import cmsis_svd
-from cmsis_svd.parser import SVDParser
 
 import jinja2
+from cmsis_svd.parser import SVDParser
+
 try:
     from . import jinja_filters
 except ImportError:
     import jinja_filters
 
-parser = argparse.ArgumentParser(
-    description='Generate code from CMSIS-SVD using JINJA templates.')
-parser.add_argument('svd', type=str,
-                    help='SVD File')
-parser.add_argument('--templates', type=str,
-                    help='Path to templates')
-parser.add_argument('--peripheral', type=str,  action='append',
-                    help='Peripheral Template Name')
-parser.add_argument('--device', type=str,  action='append',
-                    help='Device Template Name')
-parser.add_argument('--out-path', type=str,
-                    help='Output File Path')
+parser = argparse.ArgumentParser(description="Generate code from CMSIS-SVD using JINJA templates.")
+parser.add_argument("svd", type=str, help="SVD File")
+parser.add_argument("--templates", type=str, help="Path to templates")
+parser.add_argument("--peripheral", type=str, action="append", help="Peripheral Template Name")
+parser.add_argument("--device", type=str, action="append", help="Device Template Name")
+parser.add_argument("--out-path", type=str, help="Output File Path")
+
 
 def main(svd_file, templates_path, peripheral_templates, device_templates, out_path):
     parser = SVDParser.for_xml_file(svd_file)
@@ -64,27 +57,29 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
 
     # Filters
 
-
     # Generate a file for each peripheral.
     # Replace 'peripheral' with the name of the peripheral to derive the file name.
     loader = jinja2.loaders.FileSystemLoader(templates_path)
 
     # Load template-specific filters if available
     template_filters = None
-    template_filters_path = os.path.join(templates_path, 'template_jinja_filters.py')
+    template_filters_path = os.path.join(templates_path, "template_jinja_filters.py")
     if os.path.exists(template_filters_path):
-        spec = importlib.util.spec_from_file_location("template_jinja_filters", template_filters_path)
+        spec = importlib.util.spec_from_file_location(
+            "template_jinja_filters", template_filters_path
+        )
         template_filters = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(template_filters)
 
     # Filters
     for p_template in peripheral_templates:
-        for p in svd_dict['peripherals']:
-            out_file = p_template.replace('peripheral', p['name'])
-            out_file = re.sub(r'\.jinja2$', '', out_file)
+        for p in svd_dict["peripherals"]:
+            out_file = p_template.replace("peripheral", p["name"])
+            out_file = re.sub(r"\.jinja2$", "", out_file)
             out_file_path = os.path.join(out_path, out_file)
-            peripheral_env = jinja2.Environment(loader=loader,
-                                                extensions=['jinja2.ext.loopcontrols'])
+            peripheral_env = jinja2.Environment(
+                loader=loader, extensions=["jinja2.ext.loopcontrols"]
+            )
 
             jinja_filters.setup(peripheral_env)
             if template_filters is not None:
@@ -92,31 +87,29 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
 
             tmpl = peripheral_env.get_template(p_template)
             with open(out_file_path, "w") as fout:
-                fout.write(tmpl.render(device=svd_dict,
-                                       peripheral=p,
-                                       svd=svd_file,
-                                       svd_name=svd_name))
+                fout.write(
+                    tmpl.render(device=svd_dict, peripheral=p, svd=svd_file, svd_name=svd_name)
+                )
                 fout.close()
 
     for d_template in device_templates:
         # Replace 'device' with the name of the device to derive the file name.
-        out_file = d_template.replace('device', svd_dict['name'])
-        out_file = re.sub(r'\.jinja2$', '', out_file)
+        out_file = d_template.replace("device", svd_dict["name"])
+        out_file = re.sub(r"\.jinja2$", "", out_file)
         out_file_path = os.path.join(out_path, out_file)
-        device_env = jinja2.Environment(loader=loader,
-                                        extensions=['jinja2.ext.loopcontrols'])
+        device_env = jinja2.Environment(loader=loader, extensions=["jinja2.ext.loopcontrols"])
         jinja_filters.setup(device_env)
         tmpl = device_env.get_template(d_template)
 
         with open(out_file_path, "w") as fout:
-            fout.write(tmpl.render(device=svd_dict,
-                                   svd=svd_file,
-                                   svd_name=svd_name))
+            fout.write(tmpl.render(device=svd_dict, svd=svd_file, svd_name=svd_name))
             fout.close()
+
 
 def cli_main():
     args = parser.parse_args()
     main(args.svd, args.templates, args.peripheral, args.device, args.out_path)
+
 
 if __name__ == "__main__":
     cli_main()
