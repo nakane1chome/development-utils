@@ -1,0 +1,55 @@
+/*
+ * {{ device.name }} Machine/Board
+ *
+ * Generated from SVD file: {{ svd_name }}.
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * HMFL-1 stub - register-accurate interface only.
+ */
+
+#include "qemu/osdep.h"
+#include "qapi/error.h"
+#include "hw/core/boards.h"
+#include "hw/core/qdev-properties.h"
+#include "hw/core/qdev-clock.h"
+#include "hw/arm/{{ device.name | lower }}_soc.h"
+#include "hw/arm/boot.h"
+
+/* Default system clock frequency */
+#define SYSCLK_FRQ  500000000ULL  /* 500 MHz - adjust as needed */
+
+static void {{ device.name | lower }}_init(MachineState *machine)
+{
+    {{ device.name }}State *s;
+    DeviceState *dev;
+    Clock *sysclk;
+
+    /* Create system clock */
+    sysclk = clock_new(OBJECT(machine), "SYSCLK");
+    clock_set_hz(sysclk, SYSCLK_FRQ);
+
+    /* Create SoC */
+    dev = qdev_new(TYPE_{{ device.name | upper }}_SOC);
+    s = {{ device.name | upper }}_SOC(dev);
+    s->sysclk = sysclk;
+
+    object_property_add_child(OBJECT(machine), "soc", OBJECT(dev));
+    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+
+    /* Load kernel if specified */
+    armv7m_load_kernel(ARM_CPU(first_cpu),
+                       machine->kernel_filename,
+                       0,
+                       {{ device.name | upper }}_FLASH_SIZE);
+}
+
+static void {{ device.name | lower }}_machine_init(MachineClass *mc)
+{
+    mc->desc = "{{ device.name }} ({{ device.description | default('Cortex-M7') }})";
+    mc->init = {{ device.name | lower }}_init;
+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m7");
+    mc->default_ram_size = {{ device.name | upper }}_SRAM_SIZE;
+    mc->default_ram_id = "{{ device.name | lower }}.sram";
+}
+
+DEFINE_MACHINE("{{ device.name | lower }}", {{ device.name | lower }}_machine_init)

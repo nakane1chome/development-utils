@@ -1,0 +1,39 @@
+/*
+ * {{ device.name }} SoC
+ *
+ * Generated from SVD file: {{ svd_name }}.
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * HMFL-1 stub - register-accurate interface only.
+ */
+
+#ifndef HW_ARM_{{ device.name | upper }}_SOC_H
+#define HW_ARM_{{ device.name | upper }}_SOC_H
+
+#include "hw/arm/armv7m.h"
+#include "hw/core/clock.h"
+#include "qom/object.h"
+
+#define TYPE_{{ device.name | upper }}_SOC "{{ device.name | lower }}-soc"
+OBJECT_DECLARE_SIMPLE_TYPE({{ device.name }}State, {{ device.name | upper }}_SOC)
+
+/* Memory sizes - adjust as needed for target */
+#define {{ device.name | upper }}_FLASH_SIZE   (8 * 1024 * 1024)   /* 8MB */
+#define {{ device.name | upper }}_SRAM_SIZE    (256 * 1024)        /* 256KB */
+
+/* Memory map - adjust as needed for target */
+#define {{ device.name | upper }}_FLASH_BASE   0x60000000
+#define {{ device.name | upper }}_SRAM_BASE    0x20000000
+
+struct {{ device.name }}State {
+    SysBusDevice parent_obj;
+
+    ARMv7MState armv7m;
+
+    MemoryRegion flash;
+    MemoryRegion sram;
+
+    Clock *sysclk;
+};
+
+#endif /* HW_ARM_{{ device.name | upper }}_SOC_H */
