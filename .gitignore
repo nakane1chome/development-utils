@@ -139,3 +139,9 @@ examples/device_cxx17_headers/test_single_write
 examples/device_cxx17_headers/test_CMSDK_CM3
 examples/device_cxx20_headers/test_single_write
 examples/device_cxx20_headers/test_CMSDK_CM3
+
+# Copied mock QEMU headers in examples
+examples/device_c_qemu_stubs/hw/
+examples/device_c_qemu_stubs/qemu/
+examples/device_c_qemu_stubs/qom/
+examples/device_c_qemu_stubs/svd_reg_macros.h
