@@ -14,6 +14,7 @@
 #include "hw/core/qdev-clock.h"
 #include "hw/arm/{{ device.name | lower }}_soc.h"
 #include "hw/arm/boot.h"
+#include "hw/arm/machines-qom.h"
 
 /* Default system clock frequency */
 #define SYSCLK_FRQ  500000000ULL  /* 500 MHz - adjust as needed */
@@ -48,8 +49,7 @@ static void {{ device.name | lower }}_machine_init(MachineClass *mc)
     mc->desc = "{{ device.name }} ({{ device.description | default('Cortex-M7') }})";
     mc->init = {{ device.name | lower }}_init;
     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m7");
-    mc->default_ram_size = {{ device.name | upper }}_SRAM_SIZE;
-    mc->default_ram_id = "{{ device.name | lower }}.sram";
+    /* RAM is created by the SoC, not the machine framework */
 }
 
-DEFINE_MACHINE("{{ device.name | lower }}", {{ device.name | lower }}_machine_init)
+DEFINE_MACHINE_ARM("{{ device.name | lower }}", {{ device.name | lower }}_machine_init)

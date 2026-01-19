@@ -31,6 +31,7 @@ struct {{ device.name }}State {
     ARMv7MState armv7m;
 
     MemoryRegion flash;
+    MemoryRegion flash_alias;  /* Boot alias at address 0 */
     MemoryRegion sram;
 
     Clock *sysclk;

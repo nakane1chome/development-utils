@@ -39,6 +39,12 @@ static void {{ device.name | lower }}_soc_realize(DeviceState *dev_soc, Error **
     memory_region_add_subregion(get_system_memory(),
                                 {{ device.name | upper }}_FLASH_BASE, &s->flash);
 
+    /* Boot alias - map flash to address 0 for Cortex-M boot */
+    memory_region_init_alias(&s->flash_alias, OBJECT(dev_soc),
+                             "{{ device.name | lower }}.flash-alias", &s->flash, 0,
+                             {{ device.name | upper }}_FLASH_SIZE);
+    memory_region_add_subregion(get_system_memory(), 0, &s->flash_alias);
+
     /* SRAM */
     memory_region_init_ram(&s->sram, OBJECT(dev_soc), "{{ device.name | lower }}.sram",
                            {{ device.name | upper }}_SRAM_SIZE, errp);
