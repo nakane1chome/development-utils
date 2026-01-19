@@ -16,7 +16,7 @@ all : ${EXAMPLES:%=.%-gen}
 
 .svd_c_qemu_stubs-gen: \
 	${wildcard ../c_qemu_svd_stubs/template/*} \
-	${wildcard ../c_qemu_svd_stubs/include/*}
+	${wildcard ../extern/mock_qemu_headers/*}
 
 .dbml_jinja-gen : \
 	dbml/example_schema.dbml \
