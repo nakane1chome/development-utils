@@ -71,8 +71,8 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
         template_filters = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(template_filters)
 
-    # Filters
-    for p_template in peripheral_templates:
+    # Process peripheral templates
+    for p_template in peripheral_templates or []:
         for p in svd_dict["peripherals"]:
             out_file = p_template.replace("peripheral", p["name"])
             out_file = re.sub(r"\.jinja2$", "", out_file)
