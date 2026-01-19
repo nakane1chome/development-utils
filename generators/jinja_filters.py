@@ -30,6 +30,9 @@ def compress_register_array(registers):
     """Take and array and compress it by removing duplicates.
     Looks for duplicated names such as foo0, foo1, foo2 etc, and then checks the fields match.
     """
+    # Filter out registers without names
+    registers = [r for r in registers if r.get("name")]
+
     # Return an array of [register name, register, None or count]
     ret = []
     current_reg = None
