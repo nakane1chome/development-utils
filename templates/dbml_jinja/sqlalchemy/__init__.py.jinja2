@@ -1,0 +1,22 @@
+"""
+Database models.
+
+Auto-generated from DBML schema.
+"""
+
+from ..base import Base, get_engine, get_session, init_db
+
+# Import all models
+{% for table in tables -%}
+from .{{ table.name }}_model import {{ table.name | pascal_case }}
+{% endfor %}
+
+__all__ = [
+    "Base",
+    "get_engine",
+    "get_session",
+    "init_db",
+{% for table in tables -%}
+    "{{ table.name | pascal_case }}",
+{% endfor -%}
+]

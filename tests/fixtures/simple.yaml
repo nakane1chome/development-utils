@@ -1,0 +1,7 @@
+name: test
+version: 1.0
+items:
+  - id: 1
+    value: foo
+  - id: 2
+    value: bar

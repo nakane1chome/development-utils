@@ -1,0 +1,39 @@
+/*
+ * Device base addresses and IRQ definitions for {{device.name}}.
+ * Generated from SVD file: {{svd_name}}.
+ * SPDX-License-Identifier: MIT
+ *
+ * DO NOT EDIT - This file is auto-generated.
+ */
+
+#ifndef {{device.name|upper}}_DEVICE_H
+#define {{device.name|upper}}_DEVICE_H
+
+#include <stdint.h>
+
+/*
+ * Device: {{device.name}}
+ * {{(device.description or 'No description') | wordwrap(70) | replace('\n', '\n * ')}}
+ */
+
+/* ----------------------------------------------------------------------------
+ * Peripheral Base Addresses
+ * ----------------------------------------------------------------------------
+ */
+{% for p in device.peripherals %}
+#define {{device.name|upper}}_{{p.name|upper}}_BASE    ({{"0x%08XULL"|format(p.base_address)}})
+{%- endfor %}
+
+/* ----------------------------------------------------------------------------
+ * Interrupt Numbers
+ * ----------------------------------------------------------------------------
+ */
+{%- for p in device.peripherals %}
+{%- if p.interrupts %}
+{%- for i in p.interrupts %}
+#define {{device.name|upper}}_{{p.name|upper}}_{{i.name|upper}}_IRQ    ({{i.value}})
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
+
+#endif /* {{device.name|upper}}_DEVICE_H */

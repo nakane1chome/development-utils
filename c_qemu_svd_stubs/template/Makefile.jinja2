@@ -1,0 +1,34 @@
+# Makefile for generated QEMU device stubs
+# Generated from SVD file: {{svd_name}}
+#
+# This Makefile compiles the generated C stubs using the provided
+# QEMU stub headers for testing without full QEMU dependency.
+
+CC ?= gcc
+CFLAGS ?= -Wall -Wextra -std=c11 -O2
+INCLUDES = -I.
+
+# Generated source files
+SOURCES = {% for p in device.peripherals %}{{p.name}}_qemu_stub.c {% endfor %}
+
+OBJECTS = $(SOURCES:.c=.o)
+
+.PHONY: all clean check
+
+all: $(OBJECTS)
+	@echo "Compiled $(words $(OBJECTS)) device stub object files"
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+check: all
+	@echo "Build successful - all stubs compile correctly"
+
+clean:
+	rm -f $(OBJECTS)
+
+# Dependencies (simplified - all stubs depend on headers)
+$(OBJECTS): {{device.name}}.h svd_reg_macros.h
+{% for p in device.peripherals %}
+{{p.name}}_qemu_stub.o: {{p.name}}_regs.h {{p.name}}_qemu_stub.h
+{% endfor %}

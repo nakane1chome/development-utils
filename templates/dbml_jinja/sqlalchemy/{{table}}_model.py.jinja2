@@ -1,0 +1,131 @@
+"""{{ table.name | pascal_case }} model."""
+
+from datetime import datetime
+{%- set has_enums = columns | selectattr('type', 'is_enum') | list | length > 0 %}
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, PrimaryKeyConstraint, UniqueConstraint{% if has_enums %}, Enum{% endif %}
+
+from sqlalchemy.orm import relationship
+
+from ..base import Base
+
+
+class {{ table.name | pascal_case }}(Base):
+    """{{ table.note if table.note else table.name | pascal_case + ' model' }}."""
+
+    __tablename__ = "{{ table.name }}"
+{%- set enum_columns = columns | selectattr('type', 'is_enum') | list %}
+{%- if enum_columns %}
+
+    # Enums
+{% for column in enum_columns %}
+    {{ column.type | enum_name | pascal_case }} = Enum({{ column.type | enum_values | map('tojson') | join(', ') }}, name='{{ column.type | enum_name }}')
+{% endfor %}
+{%- endif %}
+
+    # Columns
+{%- set pk_index = table.indexes | selectattr('pk', 'equalto', True) | list %}
+{%- set pk_columns = pk_index[0].subject_names if pk_index else [] %}
+
+{% for column in columns %}
+    {{ column.name }} = Column(
+{%- if column.type is is_enum -%}
+{{ column.type | enum_name | pascal_case }}
+{%- else -%}
+{{ column.type | to_sqlalchemy_type }}
+{%- endif -%}
+{%- for ref in column.get_refs() -%}
+{%- for col in ref.col2 -%}
+        , ForeignKey("{{ ref.table2.name }}.{{ col.name }}")
+{%- endfor -%}
+{%- endfor -%}
+{%- if column.pk and not pk_columns -%}
+        , primary_key=True
+{%- endif -%}
+{%- if column.pk or column.name in pk_columns or column.not_null -%}
+        , nullable=False
+{%- elif not column.not_null -%}
+        , nullable=True
+{%- endif -%}
+{%- if column.unique -%}
+        , unique=True
+{%- endif -%}
+{%- if column.default -%}
+{%- if column.default|string == 'now()' -%}
+        , default=datetime.utcnow
+{%- else -%}
+        , default={{ column.default }}
+{%- endif -%}
+{%- endif -%}
+    )
+{% endfor %}
+
+
+{%- if table.indexes %}
+
+    __table_args__ = (
+{%- for index in table.indexes %}
+{%- if index.pk %}
+        PrimaryKeyConstraint({{ index.subjects | quoted_names_to_list }}),
+{%- else %}
+        UniqueConstraint({{ index.subjects | quoted_names_to_list }}),
+{%- endif %}
+{%- endfor %}
+    )
+{%- endif %}
+
+    # Relationships (1)
+{% for ref in refs -%}
+{%- if ref.table1 == table -%}
+{%- set rel_name = ref.name if ref.name else (ref.col1[0].name | relationship_name if ref.col1 else ref.table2.name) %}
+{%- set refs_to_table2 = database.refs | selectattr('table1', 'equalto', table) | selectattr('table2', 'equalto', ref.table2) | list %}
+    {{ rel_name }} = relationship("{{ ref.table2.name | pascal_case }}"
+
+{%- if ref.table1 == ref.table2 and ref.col2 -%}
+    , remote_side=[{{ref.col2 | names_to_list}}]
+{%- endif -%}
+
+{%- if ref.col1 -%}
+    , foreign_keys=[{{ref.col1 | names_to_list}}]
+{%- endif -%}
+
+{%- if refs_to_table2 | length == 1 -%}
+{%- if ref.table1 == ref.table2 -%}
+    , back_populates="following"
+{%- else -%}
+    , back_populates="{{ table.name }}"
+{%- endif -%}
+{%- endif -%}
+    )
+{% endif -%}{#- if ref.table1 == table -#}
+{% endfor %}{# for ref in refs #}
+
+    # Relationships (2)
+{% for ref in refs -%}
+{%- if ref.table1 == table -%}
+{% if ref.table1 == ref.table2 %}
+    following = relationship("{{ ref.table2.name | pascal_case }}", foreign_keys=[{{ref.col1 | names_to_list}}], back_populates="{{ rel_name }}")
+{%- endif -%}
+{%- endif -%}{#- if ref.table1 == table -#}
+{% endfor -%}{#- for ref in refs #}
+
+    # Relationships (3)
+{% set processed_tables = [] -%}
+{% for ref in database.refs if ref.table2 == table and ref.table1 != table and not (ref.table1 | is_junction_table) %}
+{%- set refs_from_table1 = database.refs | selectattr('table1', 'equalto', ref.table1) | selectattr('table2', 'equalto', table) | list -%}
+{%- if refs_from_table1 | length == 1 and ref.table1.name not in processed_tables -%}
+{%- set reverse_rel_name = ref.table1.name -%}
+{%- set forward_rel_name = ref.name if ref.name else (ref.col1[0].name | relationship_name if ref.col1 else table.name) %}
+    {{ reverse_rel_name }} = relationship("{{ ref.table1.name | pascal_case }}", back_populates="{{ forward_rel_name }}")
+{% set _ = processed_tables.append(ref.table1.name) %}
+{% endif %}
+{% endfor %}
+
+    # Relationships (4)
+{% for other_table in database.tables if other_table | is_junction_table -%}
+{%- for ref in database.refs if ref.table1 == other_table and ref.table2 == table -%}
+{%- set junction_rel_name = (other_table.name | singular)  %}
+{%- set forward_rel_name = ref.name if ref.name else (ref.col1[0].name | relationship_name if ref.col1 else table.name) %}
+    {{ junction_rel_name }}s = relationship("{{ other_table.name | pascal_case }}", back_populates="{{ forward_rel_name }}")
+{%  endfor -%}
+{% endfor %}

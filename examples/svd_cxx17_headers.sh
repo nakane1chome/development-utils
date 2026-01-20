@@ -6,12 +6,12 @@ fi
 SVD_IN=../extern/cmsis-svd/data/ARM_SAMPLE/CMSDK_CM3.svd
 ../generators/svd_jinja.py \
     --out-path device_${VER}_headers/ \
-    --device device.hpp \
-    --device test_device.cpp \
-    --peripheral peripheral_mmio_param.hpp \
-    --peripheral peripheral_mmio_regs.hpp \
-    --peripheral peripheral_mmio_dev.hpp \
+    --device device.hpp.jinja2 \
+    --device test_device.cpp.jinja2 \
+    --peripheral peripheral_mmio_param.hpp.jinja2 \
+    --peripheral peripheral_mmio_regs.hpp.jinja2 \
+    --peripheral peripheral_mmio_dev.hpp.jinja2 \
     --templates ../${VER}_mmio_interface/template/ \
     ${SVD_IN}
 
-make -C device_${VER}_headers/
+make -C device_${VER}_headers/ -f Makefile.gxx

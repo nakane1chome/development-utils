@@ -1,0 +1,6 @@
+{
+  "device_name": "{{ device.name }}",
+  "device_version": "{{ device.version }}",
+  "peripheral_count": {{ device.peripherals | length }},
+  "first_peripheral": "{{ device.peripherals[0].name }}"
+}

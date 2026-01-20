@@ -1,0 +1,17 @@
+<html>
+<head>
+<title> Address map for {{ data[0].compatible[0] }}</title>
+</head>
+<body>
+<h1> Address map for {{ data[0].compatible[0] }}</h1>
+<table border=1>
+{%- for p, data in data[0].soc.items() %}
+<tr>
+{%- if data.reg %}
+<td>{{p}}</td><td>{{"0x%08x"|format(data.reg[0][0])}}</td><td> {{ data.compatible[0] }}</td></tr>
+{%- endif %}
+</tr>
+{%- endfor %}
+</table>
+</body>
+</html>

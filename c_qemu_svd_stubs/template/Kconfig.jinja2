@@ -1,0 +1,10 @@
+# {{ device.name }} configuration
+#
+# Generated from SVD file: {{ svd_name }}.
+# Add this to hw/arm/Kconfig
+
+config {{ device.name | upper }}
+    bool
+    default y
+    depends on TCG && ARM
+    select ARM_V7M

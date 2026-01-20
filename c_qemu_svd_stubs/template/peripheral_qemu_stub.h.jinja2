@@ -1,0 +1,16 @@
+/*
+ * QEMU device model header for {{peripheral.name}}.
+ * Generated from SVD file: {{svd_name}}.
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
+#ifndef {{peripheral.name|upper}}_QEMU_H
+#define {{peripheral.name|upper}}_QEMU_H
+
+#include "hw/sysbus.h"
+#include "qom/object.h"
+
+#define TYPE_{{peripheral.name|upper}}    "{{peripheral.name|lower}}"
+OBJECT_DECLARE_SIMPLE_TYPE({{peripheral.name}}State, {{peripheral.name|upper}})
+
+#endif /* {{peripheral.name|upper}}_QEMU_H */

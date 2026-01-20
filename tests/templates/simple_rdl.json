@@ -1,0 +1,4 @@
+{
+  "component_name": "{{ component_name }}",
+  "root_node_type": "{{ root_node | node_type }}"
+}

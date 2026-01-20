@@ -1,0 +1,17 @@
+addrmap tiny {
+    desc = "Example tiny component";
+    reg {
+        field {
+            sw = rw;
+            hw = r;
+            desc = "Example field one.";
+        } f1[8] = 123;
+
+        field {
+            sw = r;
+            hw = w;
+            desc = "Example field two.";
+        } f2[8];
+        desc = "Example reg.";
+    }r1 @ 0xabcdef0;
+};

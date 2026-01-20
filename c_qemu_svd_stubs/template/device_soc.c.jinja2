@@ -1,0 +1,106 @@
+/*
+ * {{ device.name }} SoC
+ *
+ * Generated from SVD file: {{ svd_name }}.
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ * HMFL-1 stub - register-accurate interface only.
+ */
+
+#include "qemu/osdep.h"
+#include "qapi/error.h"
+#include "qemu/module.h"
+#include "hw/arm/boot.h"
+#include "system/address-spaces.h"
+#include "hw/arm/{{ device.name | lower }}_soc.h"
+#include "hw/core/qdev-clock.h"
+#include "hw/misc/unimp.h"
+
+#include "{{ device.name }}.h"
+
+static void {{ device.name | lower }}_soc_initfn(Object *obj)
+{
+    {{ device.name }}State *s = {{ device.name | upper }}_SOC(obj);
+
+    object_initialize_child(obj, "armv7m", &s->armv7m, TYPE_ARMV7M);
+}
+
+static void {{ device.name | lower }}_soc_realize(DeviceState *dev_soc, Error **errp)
+{
+    {{ device.name }}State *s = {{ device.name | upper }}_SOC(dev_soc);
+    DeviceState *armv7m;
+
+    /* Flash memory */
+    memory_region_init_rom(&s->flash, OBJECT(dev_soc), "{{ device.name | lower }}.flash",
+                           {{ device.name | upper }}_FLASH_SIZE, errp);
+    if (*errp) {
+        return;
+    }
+    memory_region_add_subregion(get_system_memory(),
+                                {{ device.name | upper }}_FLASH_BASE, &s->flash);
+
+    /* Boot alias - map flash to address 0 for Cortex-M boot */
+    memory_region_init_alias(&s->flash_alias, OBJECT(dev_soc),
+                             "{{ device.name | lower }}.flash-alias", &s->flash, 0,
+                             {{ device.name | upper }}_FLASH_SIZE);
+    memory_region_add_subregion(get_system_memory(), 0, &s->flash_alias);
+
+    /* SRAM */
+    memory_region_init_ram(&s->sram, OBJECT(dev_soc), "{{ device.name | lower }}.sram",
+                           {{ device.name | upper }}_SRAM_SIZE, errp);
+    if (*errp) {
+        return;
+    }
+    memory_region_add_subregion(get_system_memory(),
+                                {{ device.name | upper }}_SRAM_BASE, &s->sram);
+
+    /* ARMv7M CPU */
+    armv7m = DEVICE(&s->armv7m);
+    qdev_prop_set_uint32(armv7m, "num-irq", 256);
+    qdev_prop_set_uint32(armv7m, "num-prio-bits", 4);
+    qdev_prop_set_string(armv7m, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m7"));
+    qdev_connect_clock_in(armv7m, "cpuclk", s->sysclk);
+    object_property_set_link(OBJECT(&s->armv7m), "memory",
+                             OBJECT(get_system_memory()), errp);
+    if (*errp) {
+        return;
+    }
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->armv7m), errp)) {
+        return;
+    }
+
+    /*
+     * Peripheral stubs - HMFL-1 register-accurate interfaces
+     * These provide basic read/write functionality at correct addresses.
+     */
+{% for p in device.peripherals %}
+{% if p.base_address is defined %}
+    create_unimplemented_device("{{ p.name | lower }}",
+                                {{ device.name | upper }}_{{ p.name | upper }}_BASE,
+                                0x1000);
+{% endif %}
+{% endfor %}
+}
+
+static void {{ device.name | lower }}_soc_class_init(ObjectClass *klass, const void *data)
+{
+    DeviceClass *dc = DEVICE_CLASS(klass);
+
+    dc->realize = {{ device.name | lower }}_soc_realize;
+    (void)data;
+}
+
+static const TypeInfo {{ device.name | lower }}_soc_info = {
+    .name          = TYPE_{{ device.name | upper }}_SOC,
+    .parent        = TYPE_SYS_BUS_DEVICE,
+    .instance_size = sizeof({{ device.name }}State),
+    .instance_init = {{ device.name | lower }}_soc_initfn,
+    .class_init    = {{ device.name | lower }}_soc_class_init,
+};
+
+static void {{ device.name | lower }}_soc_types(void)
+{
+    type_register_static(&{{ device.name | lower }}_soc_info);
+}
+
+type_init({{ device.name | lower }}_soc_types)

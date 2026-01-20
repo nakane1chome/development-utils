@@ -1,0 +1,9 @@
+# {{ device.name }} build configuration
+#
+# Generated from SVD file: {{ svd_name }}.
+# Add these lines to hw/arm/meson.build
+
+arm_ss.add(when: 'CONFIG_{{ device.name | upper }}', if_true: files(
+    '{{ device.name | lower }}_soc.c',
+    '{{ device.name | lower }}_machine.c',
+))

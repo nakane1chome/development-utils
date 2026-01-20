@@ -1,0 +1,385 @@
+<html>
+<head>
+<title> Register map for ATXMEGA SPI controller</title>
+</head>
+<body>
+<h1> Register map for ATXMEGA SPI controller</h1>
+<table border=1>
+   <tr><th>Node Type</th><th>Node Name</th><th>Address</th><th>Description</th></tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.AddrmapNode>AddrmapNode</a></th>
+
+   
+   <th>ATXMEGA SPI controller</th>
+
+   
+   <td>-</td>
+   
+
+   
+   <td> Register description of Atmel XMEGA AU's SPI controller
+Transcribed from original manual as an example exercise:
+http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8331-8-and-16-bit-AVR-Microcontroller-XMEGA-AU_Manual.pdf</td>
+
+   </tr>
+
+  
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.RegNode>RegNode</a></th>
+
+   
+   <th>Control Register</th>
+
+   
+   <td>0x00000000</td>
+   
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>PRESCALER</th>
+
+   
+   <td>1 : 0</td>
+
+   
+   <td> Controls the SPI clock rate when configured in master mode</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>MODE</th>
+
+   
+   <td>3 : 2</td>
+
+   
+   <td> These bits select the transfer mode</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>MASTER</th>
+
+   
+   <td>4 : 4</td>
+
+   
+   <td> Selects master mode when written to one, and slave mode when
+written to zero. If SS is configured as an input and driven low while
+master mode is set, master mode will be cleared</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>DORD</th>
+
+   
+   <td>5 : 5</td>
+
+   
+   <td> DORD decides the data order when a byte is shifted out from
+the DATA register. When DORD is written to one, the least-significant
+bit (lsb) of the data byte is transmitted first, and when DORD is
+written to zero, the most-significant bit (msb) of the data byte is
+transmitted first</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>ENABLE</th>
+
+   
+   <td>6 : 6</td>
+
+   
+   <td> Setting this bit enables the SPI module. This bit must be
+set to enable any SPI operations</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>CLK2X</th>
+
+   
+   <td>7 : 7</td>
+
+   
+   <td> When this bit is set, the SPI speed (SCK frequency) will be
+doubled in master mode</td>
+
+   </tr>
+
+  
+
+
+
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.RegNode>RegNode</a></th>
+
+   
+   <th>Interrupt Control</th>
+
+   
+   <td>0x00000001</td>
+   
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>INTLVL</th>
+
+   
+   <td>1 : 0</td>
+
+   
+   <td> These bits enable the SPI interrupt and select the interrupt level</td>
+
+   </tr>
+
+  
+
+
+
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.RegNode>RegNode</a></th>
+
+   
+   <th>STATUS</th>
+
+   
+   <td>0x00000002</td>
+   
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>WRCOL</th>
+
+   
+   <td>6 : 6</td>
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>IF</th>
+
+   
+   <td>7 : 7</td>
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+
+
+
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.RegNode>RegNode</a></th>
+
+   
+   <th>DATA</th>
+
+   
+   <td>0x00000003</td>
+   
+
+   
+   <td> The DATA register is used for sending and receiving data.
+Writing to the register initiates the data transmission, and the byte
+written to the register will be shifted out on the SPI output line.
+Reading the register causes the shift register receive buffer to be read,
+returning the last byte successfully received</td>
+
+   </tr>
+
+  
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>WDATA</th>
+
+   
+   <td>7 : 0</td>
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+
+
+
+   
+   <tr>
+   
+   
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.FieldNode>FieldNode</a></th>
+
+   
+   <th>RDATA</th>
+
+   
+   <td>7 : 0</td>
+
+   
+   <td> None</td>
+
+   </tr>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</table>
+</body>
+</html>

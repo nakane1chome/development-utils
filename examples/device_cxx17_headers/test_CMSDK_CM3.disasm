@@ -4,154 +4,153 @@ test_CMSDK_CM3:     file format elf32-littlearm
 
 Disassembly of section .text:
 
-00008000 <main>:
+000100d8 <main>:
     public :
 
     using datatype_t = typename R::datatype;
-    
+
     void write(datatype_t value) {
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8000:	2301      	movs	r3, #1
-    8002:	f04f 4180 	mov.w	r1, #1073741824	; 0x40000000
-#include "SPI_mmio_dev.hpp"
+   100d8:	2301      	movs	r3, #1
+   100da:	f04f 4080 	mov.w	r0, #1073741824	@ 0x40000000
 #include "WDT_mmio_dev.hpp"
 #include "FPGAIO_mmio_dev.hpp"
 #include "SCC_mmio_dev.hpp"
 
+
 int main(void) {
-    8006:	b430      	push	{r4, r5}
-    8008:	f04f 2440 	mov.w	r4, #1073758208	; 0x40004000
-    800c:	600b      	str	r3, [r1, #0]
+   100de:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+   100e2:	f04f 2a40 	mov.w	sl, #1073758208	@ 0x40004000
+   100e6:	6003      	str	r3, [r0, #0]
     }
-    void clr(datatype_t value) { 
+    void clr(datatype_t value) {
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) &= ~value;
     }
     datatype_t read(void) {
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    800e:	680a      	ldr	r2, [r1, #0]
-        } else if constexpr (R::field_count == 1) {
-           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = 
+   100e8:	6804      	ldr	r4, [r0, #0]
+           // Write to single field.
+           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) =
                ((r_datatype_t)value << F::bit_offset) & F::bit_mask;
         } else {
             // Read write modify
             r_datatype_t reg_value = *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset);
-    8010:	6808      	ldr	r0, [r1, #0]
+   100ea:	6804      	ldr	r4, [r0, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8012:	4a1b      	ldr	r2, [pc, #108]	; (8080 <main+0x80>)
+   100ec:	4923      	ldr	r1, [pc, #140]	@ (1017c <main+0xa4>)
             reg_value = (((r_datatype_t)value << F::bit_offset) & F::bit_mask) | (reg_value & ~F::bit_mask);
-    8014:	4318      	orrs	r0, r3
+   100ee:	431c      	orrs	r4, r3
             *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = reg_value;
-    8016:	6008      	str	r0, [r1, #0]
+   100f0:	6004      	str	r4, [r0, #0]
      */
     f_datatype_t read(void) {
         if constexpr ((R::bit_width == F::bit_width) && (F::bit_offset == 0)) {
             return (f_datatype_t) *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset);
         } else {
             return (f_datatype_t) ((*reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset)) & F::bit_mask)  >> F::bit_offset;
-    8018:	6809      	ldr	r1, [r1, #0]
+   100f2:	6800      	ldr	r0, [r0, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    801a:	6013      	str	r3, [r2, #0]
+   100f4:	600b      	str	r3, [r1, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    801c:	6811      	ldr	r1, [r2, #0]
+   100f6:	6808      	ldr	r0, [r1, #0]
             r_datatype_t reg_value = *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset);
-    801e:	6811      	ldr	r1, [r2, #0]
+   100f8:	6808      	ldr	r0, [r1, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8020:	4d18      	ldr	r5, [pc, #96]	; (8084 <main+0x84>)
+   100fa:	f8df b084 	ldr.w	fp, [pc, #132]	@ 10180 <main+0xa8>
             reg_value = (((r_datatype_t)value << F::bit_offset) & F::bit_mask) | (reg_value & ~F::bit_mask);
-    8022:	4319      	orrs	r1, r3
+   100fe:	4318      	orrs	r0, r3
             *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = reg_value;
-    8024:	6011      	str	r1, [r2, #0]
+   10100:	6008      	str	r0, [r1, #0]
             return (f_datatype_t) ((*reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset)) & F::bit_mask)  >> F::bit_offset;
-    8026:	6812      	ldr	r2, [r2, #0]
+   10102:	6809      	ldr	r1, [r1, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8028:	4817      	ldr	r0, [pc, #92]	; (8088 <main+0x88>)
-    802a:	602b      	str	r3, [r5, #0]
+   10104:	f8df 907c 	ldr.w	r9, [pc, #124]	@ 10184 <main+0xac>
+   10108:	f8cb 3000 	str.w	r3, [fp]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    802c:	682a      	ldr	r2, [r5, #0]
+   1010c:	f8db 1000 	ldr.w	r1, [fp]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    802e:	4917      	ldr	r1, [pc, #92]	; (808c <main+0x8c>)
-    8030:	6023      	str	r3, [r4, #0]
+   10110:	f8df 8074 	ldr.w	r8, [pc, #116]	@ 10188 <main+0xb0>
+   10114:	f8ca 3000 	str.w	r3, [sl]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8032:	6822      	ldr	r2, [r4, #0]
+   10118:	f8da 1000 	ldr.w	r1, [sl]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8034:	6003      	str	r3, [r0, #0]
-    8036:	4a16      	ldr	r2, [pc, #88]	; (8090 <main+0x90>)
+   1011c:	f8df e06c 	ldr.w	lr, [pc, #108]	@ 1018c <main+0xb4>
+   10120:	f8c9 3000 	str.w	r3, [r9]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8038:	6800      	ldr	r0, [r0, #0]
+   10124:	f8d9 1000 	ldr.w	r1, [r9]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    803a:	600b      	str	r3, [r1, #0]
-    803c:	4815      	ldr	r0, [pc, #84]	; (8094 <main+0x94>)
+   10128:	f8df c064 	ldr.w	ip, [pc, #100]	@ 10190 <main+0xb8>
+   1012c:	f8c8 3000 	str.w	r3, [r8]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    803e:	6809      	ldr	r1, [r1, #0]
+   10130:	f8d8 1000 	ldr.w	r1, [r8]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8040:	6013      	str	r3, [r2, #0]
-    8042:	4915      	ldr	r1, [pc, #84]	; (8098 <main+0x98>)
+   10134:	4f17      	ldr	r7, [pc, #92]	@ (10194 <main+0xbc>)
+   10136:	f8ce 3000 	str.w	r3, [lr]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8044:	6812      	ldr	r2, [r2, #0]
+   1013a:	f8de 1000 	ldr.w	r1, [lr]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8046:	6003      	str	r3, [r0, #0]
-    8048:	4a14      	ldr	r2, [pc, #80]	; (809c <main+0x9c>)
+   1013e:	4e16      	ldr	r6, [pc, #88]	@ (10198 <main+0xc0>)
+   10140:	f8cc 3000 	str.w	r3, [ip]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    804a:	6800      	ldr	r0, [r0, #0]
+   10144:	f8dc 1000 	ldr.w	r1, [ip]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    804c:	600b      	str	r3, [r1, #0]
-    804e:	4814      	ldr	r0, [pc, #80]	; (80a0 <main+0xa0>)
+   10148:	4d14      	ldr	r5, [pc, #80]	@ (1019c <main+0xc4>)
+   1014a:	603b      	str	r3, [r7, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8050:	6809      	ldr	r1, [r1, #0]
+   1014c:	6839      	ldr	r1, [r7, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8052:	6013      	str	r3, [r2, #0]
-    8054:	4913      	ldr	r1, [pc, #76]	; (80a4 <main+0xa4>)
+   1014e:	6033      	str	r3, [r6, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8056:	6812      	ldr	r2, [r2, #0]
+   10150:	6831      	ldr	r1, [r6, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8058:	6003      	str	r3, [r0, #0]
-    805a:	4a13      	ldr	r2, [pc, #76]	; (80a8 <main+0xa8>)
+   10152:	602b      	str	r3, [r5, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    805c:	6800      	ldr	r0, [r0, #0]
+   10154:	6829      	ldr	r1, [r5, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    805e:	600b      	str	r3, [r1, #0]
+   10156:	4912      	ldr	r1, [pc, #72]	@ (101a0 <main+0xc8>)
+   10158:	4a12      	ldr	r2, [pc, #72]	@ (101a4 <main+0xcc>)
+   1015a:	600b      	str	r3, [r1, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8060:	6809      	ldr	r1, [r1, #0]
+   1015c:	6809      	ldr	r1, [r1, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8062:	6013      	str	r3, [r2, #0]
+   1015e:	6013      	str	r3, [r2, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8064:	6811      	ldr	r1, [r2, #0]
+   10160:	6811      	ldr	r1, [r2, #0]
             r_datatype_t reg_value = *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset);
-    8066:	6810      	ldr	r0, [r2, #0]
+   10162:	6810      	ldr	r0, [r2, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8068:	4910      	ldr	r1, [pc, #64]	; (80ac <main+0xac>)
+   10164:	4910      	ldr	r1, [pc, #64]	@ (101a8 <main+0xd0>)
             reg_value = (((r_datatype_t)value << F::bit_offset) & F::bit_mask) | (reg_value & ~F::bit_mask);
-    806a:	4318      	orrs	r0, r3
+   10166:	4318      	orrs	r0, r3
             *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = reg_value;
-    806c:	6010      	str	r0, [r2, #0]
+   10168:	6010      	str	r0, [r2, #0]
             return (f_datatype_t) ((*reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset)) & F::bit_mask)  >> F::bit_offset;
-    806e:	6812      	ldr	r2, [r2, #0]
+   1016a:	6812      	ldr	r2, [r2, #0]
         *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset) = value;
-    8070:	600b      	str	r3, [r1, #0]
+   1016c:	600b      	str	r3, [r1, #0]
         return *reinterpret_cast<volatile datatype_t*>(BASE_ADDR + R::offset);
-    8072:	680a      	ldr	r2, [r1, #0]
-           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) = 
-    8074:	600b      	str	r3, [r1, #0]
-    auto SCC_CFG_REG0_v = SCC_i.CFG_REG0.read();
-    // Field : REMAP
-    SCC_i.CFG_REG0.REMAP.write(1);
-    auto SCC_CFG_REG0_REMAP_v = SCC_i.CFG_REG0.REMAP.read();
+   1016e:	680a      	ldr	r2, [r1, #0]
+           *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) =
+   10170:	600b      	str	r3, [r1, #0]
+   
+   // Field : REMAP
+   SCC_i.CFG_REG0.REMAP.write(1);
+   auto SCC_CFG_REG0_REMAP_v = SCC_i.CFG_REG0.REMAP.read();
 
-    8076:	2000      	movs	r0, #0
-    8078:	bc30      	pop	{r4, r5}
+   10172:	2000      	movs	r0, #0
             return (f_datatype_t) ((*reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset)) & F::bit_mask)  >> F::bit_offset;
-    807a:	680b      	ldr	r3, [r1, #0]
-    807c:	4770      	bx	lr
-    807e:	bf00      	nop
-    8080:	40001000 	.word	0x40001000
-    8084:	40002000 	.word	0x40002000
-    8088:	40005000 	.word	0x40005000
-    808c:	40006000 	.word	0x40006000
-    8090:	40007000 	.word	0x40007000
-    8094:	40009000 	.word	0x40009000
-    8098:	40010000 	.word	0x40010000
-    809c:	40011000 	.word	0x40011000
-    80a0:	40027000 	.word	0x40027000
-    80a4:	40008000 	.word	0x40008000
-    80a8:	40028000 	.word	0x40028000
-    80ac:	4002f000 	.word	0x4002f000
+   10174:	680b      	ldr	r3, [r1, #0]
+   10176:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+   1017a:	bf00      	nop
+   1017c:	40001000 	.word	0x40001000
+   10180:	40002000 	.word	0x40002000
+   10184:	40005000 	.word	0x40005000
+   10188:	40006000 	.word	0x40006000
+   1018c:	40007000 	.word	0x40007000
+   10190:	40009000 	.word	0x40009000
+   10194:	40010000 	.word	0x40010000
+   10198:	40011000 	.word	0x40011000
+   1019c:	40027000 	.word	0x40027000
+   101a0:	40008000 	.word	0x40008000
+   101a4:	40028000 	.word	0x40028000
+   101a8:	4002f000 	.word	0x4002f000

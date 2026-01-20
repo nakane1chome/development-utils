@@ -1,0 +1,8 @@
+{
+  "table_count": {{ tables | length }},
+  "tables": [{% for table in tables %}"{{ table.name }}"{% if not loop.last %}, {% endif %}{% endfor %}],
+  "first_table": "{{ tables[0].name }}",
+  "first_table_columns": {{ tables[0].columns | length }},
+  "enum_count": {{ enums | length }},
+  "ref_count": {{ refs | length }}
+}

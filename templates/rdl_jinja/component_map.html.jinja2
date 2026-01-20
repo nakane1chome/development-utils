@@ -1,0 +1,60 @@
+<html>
+<head>
+<title> Register map for {{ component_name }}</title>
+</head>
+<body>
+<h1> Register map for {{ component_name }}</h1>
+<table border=1>
+   <tr><th>Node Type</th><th>Node Name</th><th>Address</th><th>Description</th></tr>
+
+
+{% macro node_link(node) %}
+   {% set type_name = node | node_type  %}
+    <th><a href=https://systemrdl-compiler.readthedocs.io/en/stable/api/node/components.html#systemrdl.node.{{type_name}}>{{type_name}}</a></th>
+{% endmacro %}
+
+{% macro name_row(node) %}
+   <th>{{node.get_property("name")}}</th>
+{% endmacro %}
+
+{% macro address_row(node, parent) %}
+   {%- if node | is_field %}
+   <td>{{node.msb}} : {{node.lsb}}</td>
+   {%- elif parent | is_regfile  %}
+   <td>????</td>
+   {%- elif node | is_reg  %}
+   <td>{{ "0x%08x" | format(node.address_offset) }}</td>
+   {% else %}
+   <td>-</td>
+   {% endif %}
+{% endmacro %}
+
+{% macro desc_row(node) %}
+   <td> {{ node.get_property("desc") }}</td>
+{% endmacro %}
+
+{% macro visit_node(node, parent) %}
+   <tr>
+   {{ node_link(node) }}
+   {{ name_row(node) }}
+   {{ address_row(node, parent) }}
+   {{ desc_row(node) }}
+   </tr>
+
+  {{ visit_children(node) }}
+
+{% endmacro %}
+
+{% macro visit_children(node) %}
+   {%- for child in node.children() %}
+   {{ visit_node(child, node) }}
+   {%- endfor %}
+{% endmacro %}
+
+
+{{ visit_children(root_node) }}
+
+
+</table>
+</body>
+</html>
