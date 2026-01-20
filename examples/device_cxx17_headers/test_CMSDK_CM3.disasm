@@ -132,7 +132,7 @@ int main(void) {
    1016e:	680a      	ldr	r2, [r1, #0]
            *reinterpret_cast<volatile r_datatype_t*>(BASE_ADDR + R::offset) =
    10170:	600b      	str	r3, [r1, #0]
-
+   
    // Field : REMAP
    SCC_i.CFG_REG0.REMAP.write(1);
    auto SCC_CFG_REG0_REMAP_v = SCC_i.CFG_REG0.REMAP.read();

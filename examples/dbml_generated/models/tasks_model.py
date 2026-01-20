@@ -1,12 +1,7 @@
 """Tasks model."""
 
 from datetime import datetime
-
-from sqlalchemy import (
-    Column,
-    DateTime,
-    String,
-)
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from ..base import Base
