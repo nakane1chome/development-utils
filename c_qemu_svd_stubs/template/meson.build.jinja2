@@ -6,4 +6,9 @@
 arm_ss.add(when: 'CONFIG_{{ device.name | upper }}', if_true: files(
     '{{ device.name | lower }}_soc.c',
     '{{ device.name | lower }}_machine.c',
+{% for p in device.peripherals %}
+{% if p.base_address is defined %}
+    '{{ p.name }}_qemu_stub.c',
+{% endif %}
+{% endfor %}
 ))

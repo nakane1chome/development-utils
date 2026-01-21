@@ -9,9 +9,9 @@
 #include "qemu/osdep.h"
 #include "qemu/log.h"
 #include "qemu/module.h"
-#include "hw/sysbus.h"
-#include "hw/irq.h"
-#include "hw/qdev-properties.h"
+#include "hw/core/sysbus.h"
+#include "hw/core/irq.h"
+#include "hw/core/qdev-properties.h"
 
 #include "{{peripheral.name}}_regs.h"
 
@@ -40,7 +40,7 @@ struct {{peripheral.name}}State {
     {%- set r_name = r_info.0 %}
     {%- set r = r_info.1 %}
     {%- set reg_width = r.size if r.size is defined else device.width %}
-    {{reg_width|to_c_type}} {{r_name|lower}};    /* {{(r.description or '') | truncate(40)}} */
+    {{reg_width|to_c_type}} {{r_name|safe_c_name|lower}};    /* {{(r.description or '') | truncate(40)}} */
     {%- endfor %}
 };
 
@@ -52,6 +52,9 @@ static uint64_t {{peripheral.name|lower}}_read(void *opaque, hwaddr offset, unsi
     {{peripheral.name}}State *s = {{peripheral.name|upper}}(opaque);
     uint64_t value = 0;
     (void)size;  /* Unused */
+{%- if reg_count == 0 %}
+    (void)s;     /* No registers */
+{%- endif %}
 
     switch (offset) {
     {%- set seen_read_offsets = [] %}
@@ -61,8 +64,8 @@ static uint64_t {{peripheral.name|lower}}_read(void *opaque, hwaddr offset, unsi
     {%- set access = r.access | default('read-write') %}
     {%- if access != 'write-only' and r.address_offset not in seen_read_offsets %}
     {%- set _ = seen_read_offsets.append(r.address_offset) %}
-    case {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET:
-        value = s->{{r_name|lower}};
+    case {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_OFFSET:
+        value = s->{{r_name|safe_c_name|lower}};
         break;
     {%- endif %}
     {%- endfor %}
@@ -84,6 +87,10 @@ static void {{peripheral.name|lower}}_write(void *opaque, hwaddr offset,
 {
     {{peripheral.name}}State *s = {{peripheral.name|upper}}(opaque);
     (void)size;  /* Unused */
+{%- if reg_count == 0 %}
+    (void)s;     /* No registers */
+    (void)value; /* No registers */
+{%- endif %}
 
     switch (offset) {
     {%- set seen_write_offsets = [] %}
@@ -94,18 +101,18 @@ static void {{peripheral.name|lower}}_write(void *opaque, hwaddr offset,
     {%- set modified_write = r.modified_write_values | default('modify') %}
     {%- if access != 'read-only' and r.address_offset not in seen_write_offsets %}
     {%- set _ = seen_write_offsets.append(r.address_offset) %}
-    case {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET:
+    case {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_OFFSET:
         {%- if modified_write == 'oneToClear' %}
         /* Write-1-to-clear: clear bits where value has 1s */
-        s->{{r_name|lower}} &= ~value;
+        s->{{r_name|safe_c_name|lower}} &= ~value;
         {%- elif modified_write == 'oneToSet' %}
         /* Write-1-to-set: set bits where value has 1s */
-        s->{{r_name|lower}} |= value;
+        s->{{r_name|safe_c_name|lower}} |= value;
         {%- elif modified_write == 'oneToToggle' %}
         /* Write-1-to-toggle: toggle bits where value has 1s */
-        s->{{r_name|lower}} ^= value;
+        s->{{r_name|safe_c_name|lower}} ^= value;
         {%- else %}
-        s->{{r_name|lower}} = value & {{peripheral.name|upper}}_{{r_name|upper}}_MASK;
+        s->{{r_name|safe_c_name|lower}} = value & {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_MASK;
         {%- endif %}
         break;
     {%- endif %}
@@ -136,11 +143,14 @@ static const MemoryRegionOps {{peripheral.name|lower}}_ops = {
 static void {{peripheral.name|lower}}_reset(DeviceState *dev)
 {
     {{peripheral.name}}State *s = {{peripheral.name|upper}}(dev);
+{%- if reg_count == 0 %}
+    (void)s;  /* No registers */
+{%- endif %}
 
     /* Reset all registers to their default values */
     {%- for r_info in compressed_registers %}
     {%- set r_name = r_info.0 %}
-    s->{{r_name|lower}} = {{peripheral.name|upper}}_{{r_name|upper}}_RESET;
+    s->{{r_name|safe_c_name|lower}} = {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_RESET;
     {%- endfor %}
 }
 
@@ -163,13 +173,13 @@ static void {{peripheral.name|lower}}_realize(DeviceState *dev, Error **errp)
 /*
  * Device class initialization
  */
-static void {{peripheral.name|lower}}_class_init(ObjectClass *klass, void *data)
+static void {{peripheral.name|lower}}_class_init(ObjectClass *klass, const void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
     (void)data;  /* Unused */
 
     dc->realize = {{peripheral.name|lower}}_realize;
-    dc->reset = {{peripheral.name|lower}}_reset;
+    device_class_set_legacy_reset(dc, {{peripheral.name|lower}}_reset);
     dc->desc = "{{(peripheral.description or peripheral.name + ' peripheral') | truncate(60)}}";
 }
 

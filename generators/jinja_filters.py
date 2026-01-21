@@ -1,5 +1,29 @@
 # Some quick and dirty filters that are usefull for generating C/C++ code.
 
+# C reserved keywords that need to be escaped in generated code
+C_KEYWORDS = frozenset([
+    'auto', 'break', 'case', 'char', 'const', 'continue', 'default', 'do',
+    'double', 'else', 'enum', 'extern', 'float', 'for', 'goto', 'if', 'int',
+    'long', 'register', 'return', 'short', 'signed', 'sizeof', 'static',
+    'struct', 'switch', 'typedef', 'union', 'unsigned', 'void', 'volatile',
+    'while', 'inline', 'restrict', '_Bool', '_Complex', '_Imaginary',
+    # C++ keywords for safety
+    'class', 'public', 'private', 'protected', 'virtual', 'override',
+    'template', 'typename', 'namespace', 'using', 'new', 'delete',
+    'true', 'false', 'nullptr', 'this', 'throw', 'try', 'catch'
+])
+
+
+def safe_c_name(name):
+    """Escape C/C++ reserved keywords by appending '_reg' suffix.
+
+    This filter ensures that SVD register names that conflict with C keywords
+    (e.g., 'INT', 'SWITCH') are renamed to be valid C identifiers.
+    """
+    if name.lower() in C_KEYWORDS:
+        return name + '_reg'
+    return name
+
 
 def format_mask(bit_offset, bit_width):
     """Convert a bit offset and width into a mask.
@@ -119,3 +143,4 @@ def setup(env):
     env.filters["format_mask"] = format_mask
     env.filters["compress_register_array"] = compress_register_array
     env.filters["to_c_type"] = to_c_type
+    env.filters["safe_c_name"] = safe_c_name

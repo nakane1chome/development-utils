@@ -26,7 +26,7 @@
 {% for r_info in compressed_registers %}
 {%- set r_name = r_info.0 %}
 {%- set r = r_info.1 %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_OFFSET    ({{"0x%04X"|format(r.address_offset)}})
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_OFFSET    ({{"0x%04X"|format(r.address_offset)}})
 {%- endfor %}
 
 /* ============================================================================
@@ -38,9 +38,9 @@
 {%- set r = r_info.1 %}
 {%- set reg_width = r.size if r.size is defined else device.width %}
 {%- if r.reset_value is defined and r.reset_value is not none %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_RESET    ({{"0x%0*X"|format((reg_width // 4)|int, r.reset_value)}}U)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_RESET    ({{"0x%0*X"|format((reg_width // 4)|int, r.reset_value)}}U)
 {%- else %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_RESET    (0x0U)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_RESET    (0x0U)
 {%- endif %}
 {%- endfor %}
 
@@ -53,9 +53,9 @@
 {%- set r = r_info.1 %}
 {%- set reg_width = r.size if r.size is defined else device.width %}
 {%- if r.fields %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_MASK    ({% for f in r.fields %}{{f.bit_offset|format_mask(f.bit_width)}}{% if not loop.last %} | {% endif %}{% endfor %})
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_MASK    ({% for f in r.fields %}{{f.bit_offset|format_mask(f.bit_width)}}{% if not loop.last %} | {% endif %}{% endfor %})
 {%- else %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_MASK    ({{'0x%X' % ((2 ** reg_width) - 1)}}U)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_MASK    ({{'0x%X' % ((2 ** reg_width) - 1)}}U)
 {%- endif %}
 {%- endfor %}
 
@@ -68,11 +68,11 @@
 {%- set r = r_info.1 %}
 {%- set access = r.access | default('read-write') %}
 {%- if access == 'read-only' %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_RO
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_ACCESS    SVD_ACCESS_RO
 {%- elif access == 'write-only' %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_WO
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_ACCESS    SVD_ACCESS_WO
 {%- else %}
-#define {{peripheral.name|upper}}_{{r_name|upper}}_ACCESS    SVD_ACCESS_RW
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_ACCESS    SVD_ACCESS_RW
 {%- endif %}
 {%- endfor %}
 
@@ -94,18 +94,18 @@
 /* Field: {{f.name}}
  * {{(f.description or 'No description') | wordwrap(60) | replace('\n', '\n * ')}}
  */
-#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT    ({{f.bit_offset}}U)
-#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_WIDTH    ({{f.bit_width}}U)
-#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK     ({{f.bit_offset|format_mask(f.bit_width)}})
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_SHIFT    ({{f.bit_offset}}U)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_WIDTH    ({{f.bit_width}}U)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_MASK     ({{f.bit_offset|format_mask(f.bit_width)}})
 
 /* Extract {{f.name}} field from register value */
-#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_GET(reg_val) \
-    (((reg_val) & {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK) >> {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT)
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_GET(reg_val) \
+    (((reg_val) & {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_MASK) >> {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_SHIFT)
 
 /* Insert {{f.name}} field into register value */
-#define {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SET(reg_val, field_val) \
-    (((reg_val) & ~{{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK) | \
-     (((field_val) << {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_SHIFT) & {{peripheral.name|upper}}_{{r_name|upper}}_{{f.name|upper}}_MASK))
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_SET(reg_val, field_val) \
+    (((reg_val) & ~{{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_MASK) | \
+     (((field_val) << {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_SHIFT) & {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_{{f.name|upper}}_MASK))
 {%- endfor %}
 {%- endif %}
 {%- endfor %}

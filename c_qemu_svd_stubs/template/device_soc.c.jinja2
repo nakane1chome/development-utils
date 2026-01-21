@@ -75,9 +75,7 @@ static void {{ device.name | lower }}_soc_realize(DeviceState *dev_soc, Error **
      */
 {% for p in device.peripherals %}
 {% if p.base_address is defined %}
-    create_unimplemented_device("{{ p.name | lower }}",
-                                {{ device.name | upper }}_{{ p.name | upper }}_BASE,
-                                0x1000);
+    sysbus_create_simple("{{ p.name | lower }}", {{ device.name | upper }}_{{ p.name | upper }}_BASE, NULL);
 {% endif %}
 {% endfor %}
 }
