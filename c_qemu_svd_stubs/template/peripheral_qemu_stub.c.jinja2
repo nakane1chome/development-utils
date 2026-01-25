@@ -132,8 +132,8 @@ static const MemoryRegionOps {{peripheral.name|lower}}_ops = {
     .write = {{peripheral.name|lower}}_write,
     .endianness = DEVICE_LITTLE_ENDIAN,
     .impl = {
-        .min_access_size = 4,
-        .max_access_size = 4,
+        .min_access_size = {{compressed_registers | min_access_size}},
+        .max_access_size = {{compressed_registers | max_access_size}},
     },
 };
 

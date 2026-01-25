@@ -13,6 +13,14 @@ C_KEYWORDS = frozenset([
     'true', 'false', 'nullptr', 'this', 'throw', 'try', 'catch'
 ])
 
+def asr(value, shift):
+    return value >> shift
+
+def asl(value, shift):
+    return value << shift
+
+def bits_to_bytes(value):
+    return (value +7 ) >> 3
 
 def safe_c_name(name):
     """Escape C/C++ reserved keywords by appending '_reg' suffix.
@@ -144,3 +152,6 @@ def setup(env):
     env.filters["compress_register_array"] = compress_register_array
     env.filters["to_c_type"] = to_c_type
     env.filters["safe_c_name"] = safe_c_name
+    env.filters["asr"] = asr
+    env.filters["asl"] = asl
+    env.filters["bits_to_bytes"] = bits_to_bytes

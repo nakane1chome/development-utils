@@ -1,4 +1,4 @@
-/*
+/* -*- C -*-
  * Register definitions for {{peripheral.name}}.
  * Generated from SVD file: {{svd_name}}.
  * SPDX-License-Identifier: MIT
@@ -27,6 +27,16 @@
 {%- set r_name = r_info.0 %}
 {%- set r = r_info.1 %}
 #define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_OFFSET    ({{"0x%04X"|format(r.address_offset)}})
+{%- endfor %}
+/* ============================================================================
+ * Register Sizes
+ * ============================================================================
+ */
+{% for r_info in compressed_registers %}
+{%- set r_name = r_info.0 %}
+{%- set r = r_info.1 %}
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_SIZE_BITS    ({{r.size}})
+#define {{peripheral.name|upper}}_{{r_name|safe_c_name|upper}}_SIZE    ({{r.size|bits_to_bytes}})
 {%- endfor %}
 
 /* ============================================================================
