@@ -72,9 +72,10 @@ static void {{ device.name | lower }}_soc_realize(DeviceState *dev_soc, Error **
     /*
      * Peripheral stubs - HMFL-1 register-accurate interfaces
      * These provide basic read/write functionality at correct addresses.
+     * Note: Peripherals sharing base addresses are filtered (only first kept).
      */
-{% for p in device.peripherals %}
-{% if p.base_address is defined %}
+{% for p in device.peripherals | unique_base_address %}
+{% if not p.alternate_peripheral %}
     sysbus_create_simple("{{ p.name | lower }}", {{ device.name | upper }}_{{ p.name | upper }}_BASE, NULL);
 {% endif %}
 {% endfor %}

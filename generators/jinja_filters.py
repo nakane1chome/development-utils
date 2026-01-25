@@ -145,6 +145,36 @@ def compress_register_array(registers):
     return ret
 
 
+def unique_base_address(peripherals):
+    """Filter peripherals to only include those with unique base addresses.
+
+    When multiple peripherals share the same base address (common in NXP SVD files
+    where PMU, TEMPMON, USB_ANALOG, etc. share addresses with CCM_ANALOG), only
+    the first peripheral encountered is kept. This prevents QEMU memory region
+    shadowing issues.
+
+    Args:
+        peripherals: Iterable of peripheral dicts with 'base_address' key
+
+    Returns:
+        List of peripherals with unique base addresses
+    """
+    seen_bases = set()
+    result = []
+    for p in peripherals:
+        # Handle both dict and object access
+        if isinstance(p, dict):
+            base = p.get('base_address')
+        else:
+            base = getattr(p, 'base_address', None)
+        if base is None:
+            continue
+        if base not in seen_bases:
+            seen_bases.add(base)
+            result.append(p)
+    return result
+
+
 def setup(env):
     """Register the filters in this file to the Jinja environment."""
     env.filters["to_name"] = to_name
@@ -155,3 +185,4 @@ def setup(env):
     env.filters["asr"] = asr
     env.filters["asl"] = asl
     env.filters["bits_to_bytes"] = bits_to_bytes
+    env.filters["unique_base_address"] = unique_base_address

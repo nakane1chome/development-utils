@@ -2,7 +2,9 @@
 # Install via
 # pip install -r requirements.txt
 jinja2
-cmsis_svd
+# cmsis-svd with alternatePeripheral typo fix
+# See: https://github.com/cmsis-svd/cmsis-svd/pull/197
+git+https://github.com/nakane1chome/cmsis-svd.git@fix-alternate-peripheral-typo#subdirectory=python
 pyyaml
 Pygments
 jinja2_highlight

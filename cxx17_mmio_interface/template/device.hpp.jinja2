@@ -12,7 +12,9 @@ namespace base_addr {
 
     namespace {{device.name}} {
 {%- for p in device.peripherals %}
+{%- if not p.alternate_peripheral %}
            static constexpr uintptr_t {{"%25s"|format(p.name)}} = {{"0x%08x"|format(p.base_address)}};
+{%- endif %}
 {%- endfor%}
     }
 
