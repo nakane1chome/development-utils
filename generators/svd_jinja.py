@@ -88,7 +88,7 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
             tmpl = peripheral_env.get_template(p_template)
             with open(out_file_path, "w") as fout:
                 fout.write(
-                    tmpl.render(device=svd_dict, peripheral=p, svd=svd_file, svd_name=svd_name)
+                    tmpl.render(device=svd_dict, peripheral=p, svd=svd_file, svd_name=svd_name, out_file=out_file_path)
                 )
                 fout.close()
 
@@ -102,7 +102,7 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
         tmpl = device_env.get_template(d_template)
 
         with open(out_file_path, "w") as fout:
-            fout.write(tmpl.render(device=svd_dict, svd=svd_file, svd_name=svd_name))
+            fout.write(tmpl.render(device=svd_dict, svd=svd_file, svd_name=svd_name, out_file=out_file_path))
             fout.close()
 
 
