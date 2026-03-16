@@ -76,6 +76,7 @@ def compress_register_array(registers):
         """Split register name into base name and index.
         Returns (reg, base_name, index) where index is None if not an array element.
         Only returns an index if it could be part of a zero-based array (0-999).
+        Handles both underscore-separated (FOO_0) and concatenated (FOO0) naming.
         """
         try:
             parts = reg["name"].split("_")
@@ -86,8 +87,16 @@ def compress_register_array(registers):
                 return reg, "_".join(parts[0:-1]), idx
             else:
                 return reg, reg["name"], None
-        except Exception:
-            return reg, reg["name"], None
+        except (ValueError, IndexError):
+            pass
+        # Fallback: trailing digits without underscore (SLIM0, SORG127)
+        import re
+        m = re.match(r'^(.*?)(\d+)$', reg["name"])
+        if m and m.group(1):
+            idx = int(m.group(2))
+            if idx < 1000:
+                return reg, m.group(1), idx
+        return reg, reg["name"], None
 
     def format_reg_array(reg_name, reg, idx, start_idx):
         """Format a register or array entry.

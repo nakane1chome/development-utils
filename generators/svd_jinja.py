@@ -92,13 +92,15 @@ def main(svd_file, templates_path, peripheral_templates, device_templates, out_p
                 )
                 fout.close()
 
-    for d_template in device_templates:
+    for d_template in device_templates or []:
         # Replace 'device' with the name of the device to derive the file name.
         out_file = d_template.replace("device", svd_dict["name"])
         out_file = re.sub(r"\.jinja2$", "", out_file)
         out_file_path = os.path.join(out_path, out_file)
         device_env = jinja2.Environment(loader=loader, extensions=["jinja2.ext.loopcontrols"])
         jinja_filters.setup(device_env)
+        if template_filters is not None:
+            template_filters.setup(device_env)
         tmpl = device_env.get_template(d_template)
 
         with open(out_file_path, "w") as fout:
